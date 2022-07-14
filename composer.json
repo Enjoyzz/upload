@@ -15,8 +15,14 @@
             "role": "Developer"
         }
     ],
-    "require": {},
-    "require-dev": {},
+    "require": {
+        "php": ">= 8.0",
+        "psr/http-message": "^1.0",
+        "enjoys/functions": "^2.3"
+    },
+    "require-dev": {
+        "vimeo/psalm": "^4.24"
+    },
     "autoload": {
         "psr-4": {
             "Enjoys\\Upload\\": "src"
@@ -27,5 +33,7 @@
             "Enjoys\\Tests\\Upload\\": "tests"
         }
     },
-    "scripts": {}
+    "scripts": {
+        "psalm": "./vendor/bin/psalm"
+    }
 }
