@@ -21,7 +21,8 @@
         "enjoys/functions": "^2.3"
     },
     "require-dev": {
-        "vimeo/psalm": "^4.24"
+        "vimeo/psalm": "^4.24",
+        "phpunit/phpunit": "^9.5"
     },
     "autoload": {
         "psr-4": {
