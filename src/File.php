@@ -8,8 +8,6 @@ use Psr\Http\Message\UploadedFileInterface;
 
 final class File
 {
-
-
     private ?string $filename;
     private ?string $originalFilename;
     private ?string $mimeType;
@@ -18,8 +16,7 @@ final class File
 
     public function __construct(private UploadedFileInterface $uploadedFile, private StorageInterface $storage)
     {
-        $this->filename = $this->uploadedFile->getClientFilename();
-        $this->originalFilename = $this->uploadedFile->getClientFilename();
+        $this->filename = $this->originalFilename = $this->uploadedFile->getClientFilename();
         $this->mimeType = $this->uploadedFile->getClientMediaType();
         $this->extension = pathinfo(
             $uploadedFile->getClientFilename(),
@@ -28,7 +25,7 @@ final class File
         $this->size = $this->uploadedFile->getSize();
     }
 
-    public function upload()
+    public function upload(): ?string
     {
         return $this->storage->upload($this);
     }
@@ -36,63 +33,47 @@ final class File
 
     public function setFilename(string $filename): void
     {
-        $extension = (empty($this->getExtension())) ? '' : '.' . $this->getExtension();
-        $this->filename = rtrim($filename, $extension) . $extension;
+        $this->filename = rtrim($filename, $this->getExtensionWithDot()) . $this->getExtensionWithDot();
     }
 
-    public function getFilenameWithoutExtension(): string
-    {
-        $extension = (empty($this->getExtension())) ? '' : '.' . $this->getExtension();
-        return rtrim($this->getFilename(), $extension);
-    }
-
-    /**
-     * @return UploadedFileInterface
-     */
-    public function getUploadedFile(): UploadedFileInterface
-    {
-        return $this->uploadedFile;
-    }
-
-    /**
-     * @return string|null
-     */
     public function getFilename(): ?string
     {
         return $this->filename;
     }
 
-    /**
-     * @return string|null
-     */
+    public function getFilenameWithoutExtension(): string
+    {
+        return rtrim($this->getFilename(), $this->getExtensionWithDot());
+    }
+
     public function getOriginalFilename(): ?string
     {
         return $this->originalFilename;
     }
 
-    /**
-     * @return string|null
-     */
-    public function getMimeType(): ?string
-    {
-        return $this->mimeType;
-    }
-
-    /**
-     * @return string
-     */
     public function getExtension(): string
     {
         return $this->extension;
     }
 
-    /**
-     * @return int|null
-     */
+    public function getExtensionWithDot(): string
+    {
+        return (empty($this->getExtension())) ? '' : '.' . $this->getExtension();
+    }
+
     public function getSize(): ?int
     {
         return $this->size;
     }
 
+    public function getMimeType(): ?string
+    {
+        return $this->mimeType;
+    }
+
+    public function getUploadedFile(): UploadedFileInterface
+    {
+        return $this->uploadedFile;
+    }
 
 }
