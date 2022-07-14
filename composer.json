@@ -1,18 +1,17 @@
 {
-    "name": ":vendor/:package_name",
+    "name": "enjoys/upload",
     "type": "library",
-    "description": ":package_description",
+    "description": "",
     "keywords": [
-        ":vendor",
-        ":package_name"
+        "Enjoys",
+        "upload"
     ],
-    "homepage": "https://github.com/:vendor/:package_name",
+    "homepage": "https://github.com/Enjoyzz/upload",
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": ":author_email",
-            "homepage": ":author_website",
+            "name": "Enjoys",
+            "homepage": "https://github.com/Enjoyzz",
             "role": "Developer"
         }
     ],
@@ -20,12 +19,12 @@
     "require-dev": {},
     "autoload": {
         "psr-4": {
-            ":vendor\\:package_name\\": "src"
+            "Enjoys\\Upload\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            ":vendor\\:package_name\\": "tests"
+            "Enjoys\\Tests\\Upload\\": "tests"
         }
     },
     "scripts": {}
