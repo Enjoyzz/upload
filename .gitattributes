@@ -1,0 +1,10 @@
+# Path-based git attributes
+# https://www.kernel.org/pub/software/scm/git/docs/gitattributes.html
+
+.* export-ignore
+infection/ export-ignore
+phpunit.xml.dist export-ignore
+phpcs.xml.dist export-ignore
+psalm.xml export-ignore
+tests/ export-ignore
+example/ export-ignore
