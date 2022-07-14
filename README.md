@@ -1,6 +1,6 @@
 # Example
 
-```injectablephp
+```php
 use Enjoys\Upload\File;
 use Enjoys\Upload\Storage\FileSystem;
 use Psr\Http\Message\ServerRequestInterface;
