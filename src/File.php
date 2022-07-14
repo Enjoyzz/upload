@@ -8,18 +8,18 @@ use Psr\Http\Message\UploadedFileInterface;
 
 final class File
 {
-    private ?string $filename;
-    private ?string $originalFilename;
-    private ?string $mimeType;
+    private string $filename;
+    private string $originalFilename;
+    private string $mimeType;
     private string $extension;
     private ?int $size;
 
     public function __construct(private UploadedFileInterface $uploadedFile, private StorageInterface $storage)
     {
-        $this->filename = $this->originalFilename = $this->uploadedFile->getClientFilename();
-        $this->mimeType = $this->uploadedFile->getClientMediaType();
+        $this->filename = $this->originalFilename = $this->uploadedFile->getClientFilename() ?? '';
+        $this->mimeType = $this->uploadedFile->getClientMediaType() ?? '';
         $this->extension = pathinfo(
-            $uploadedFile->getClientFilename(),
+            $uploadedFile->getClientFilename() ?? '',
             PATHINFO_EXTENSION
         );
         $this->size = $this->uploadedFile->getSize();
@@ -36,7 +36,7 @@ final class File
         $this->filename = rtrim($filename, $this->getExtensionWithDot()) . $this->getExtensionWithDot();
     }
 
-    public function getFilename(): ?string
+    public function getFilename(): string
     {
         return $this->filename;
     }
@@ -46,7 +46,7 @@ final class File
         return rtrim($this->getFilename(), $this->getExtensionWithDot());
     }
 
-    public function getOriginalFilename(): ?string
+    public function getOriginalFilename(): string
     {
         return $this->originalFilename;
     }
@@ -66,7 +66,7 @@ final class File
         return $this->size;
     }
 
-    public function getMimeType(): ?string
+    public function getMimeType(): string
     {
         return $this->mimeType;
     }
