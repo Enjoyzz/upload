@@ -33,7 +33,7 @@ final class File
     public function upload(string $targetPath = '/'): ?string
     {
         $targetPath = $targetPath . $this->getFilename();
-        $this->filesystem->writeStream($targetPath, $this->uploadedFile->getStream());
+        $this->filesystem->writeStream($targetPath, $this->uploadedFile->getStream()->detach());
         return $targetPath;
     }
 
