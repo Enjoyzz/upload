@@ -31,9 +31,9 @@ final class File
     /**
      * @throws FilesystemException
      */
-    public function upload(string $targetPath = ''): void
+    public function upload(string $targetPath = '/'): void
     {
-        $this->targetPath = $targetPath . $this->getFilename();
+        $this->targetPath = rtrim($targetPath, '/') . '/' . $this->getFilename();
         $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
     }
 
