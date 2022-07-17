@@ -15,6 +15,7 @@ final class File
     private string $mimeType;
     private string $extension;
     private ?int $size;
+    private ?string $targetPath = null;
 
     public function __construct(private UploadedFileInterface $uploadedFile, private FilesystemOperator $filesystem)
     {
@@ -30,11 +31,10 @@ final class File
     /**
      * @throws FilesystemException
      */
-    public function upload(string $targetPath = '/'): ?string
+    public function upload(string $targetPath = ''): void
     {
-        $targetPath = $targetPath . $this->getFilename();
-        $this->filesystem->writeStream($targetPath, $this->uploadedFile->getStream()->detach());
-        return $targetPath;
+        $this->targetPath = $targetPath . $this->getFilename();
+        $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
     }
 
 
@@ -81,6 +81,18 @@ final class File
     public function getUploadedFile(): UploadedFileInterface
     {
         return $this->uploadedFile;
+    }
+
+
+    public function getTargetPath(): ?string
+    {
+        return $this->targetPath;
+    }
+
+
+    public function getFilesystem(): FilesystemOperator
+    {
+        return $this->filesystem;
     }
 
 }
