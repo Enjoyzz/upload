@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Enjoys\Upload;
 
+use League\Flysystem\FilesystemException;
+use League\Flysystem\FilesystemOperator;
 use Psr\Http\Message\UploadedFileInterface;
 
 final class File
@@ -13,8 +15,9 @@ final class File
     private string $mimeType;
     private string $extension;
     private ?int $size;
+    private ?string $targetPath = null;
 
-    public function __construct(private UploadedFileInterface $uploadedFile, private StorageInterface $storage)
+    public function __construct(private UploadedFileInterface $uploadedFile, private FilesystemOperator $filesystem)
     {
         $this->filename = $this->originalFilename = $this->uploadedFile->getClientFilename() ?? '';
         $this->mimeType = $this->uploadedFile->getClientMediaType() ?? '';
@@ -25,9 +28,13 @@ final class File
         $this->size = $this->uploadedFile->getSize();
     }
 
-    public function upload(): ?string
+    /**
+     * @throws FilesystemException
+     */
+    public function upload(string $targetPath = '/'): void
     {
-        return $this->storage->upload($this);
+        $this->targetPath = rtrim($targetPath, '/') . '/' . $this->getFilename();
+        $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
     }
 
 
@@ -74,6 +81,18 @@ final class File
     public function getUploadedFile(): UploadedFileInterface
     {
         return $this->uploadedFile;
+    }
+
+
+    public function getTargetPath(): ?string
+    {
+        return $this->targetPath;
+    }
+
+
+    public function getFilesystem(): FilesystemOperator
+    {
+        return $this->filesystem;
     }
 
 }
