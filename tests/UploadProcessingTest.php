@@ -26,7 +26,11 @@ class UploadProcessingTest extends TestCase
 
     public function testUpload()
     {
-        $filesystem = $this->getMockBuilder(Filesystem::class)->disableOriginalConstructor()->getMock();
+        $filesystem = $this->getMockBuilder(Filesystem::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $filesystem->expects($this->atLeast(3))->method('writeStream');
+
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
         $file = new UploadProcessing($uploadedFile, $filesystem);
 

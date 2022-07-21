@@ -125,6 +125,17 @@ class FileInfoTest extends TestCase
         $this->assertSame(128, $fileInfo->getSize());
     }
 
+    public function testGetSizeIfSizeNull()
+    {
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK
+        );
+        $fileInfo = new FileInfo($file);
+        $this->assertSame(0, $fileInfo->getSize());
+    }
+
     public function testGetFilenameWithoutExtension()
     {
         $file = new UploadedFile(
@@ -139,5 +150,18 @@ class FileInfoTest extends TestCase
         $this->assertSame('text', $fileInfo->getFilenameWithoutExtension());
     }
 
-
+    public function testSetFilenameWithNonStandardExtension()
+    {
+        $file = new UploadedFile(
+            $this->tmpFile,
+            128,
+            UPLOAD_ERR_OK,
+            clientFilename: $originalFilename = 'test.^extension'
+        );
+        $fileInfo = new FileInfo($file);
+        $fileInfo->setFilename('text.^extension');
+        $this->assertSame($originalFilename, $fileInfo->getOriginalFilename());
+        $this->assertSame('text.^extension', $fileInfo->getFilename());
+        $this->assertSame('text', $fileInfo->getFilenameWithoutExtension());
+    }
 }
