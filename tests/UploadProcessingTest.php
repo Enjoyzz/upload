@@ -7,6 +7,7 @@ namespace Enjoys\Tests\Upload;
 use Enjoys\Upload\UploadProcessing;
 use GuzzleHttp\Psr7\UploadedFile;
 use League\Flysystem\Filesystem;
+use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 
 class UploadProcessingTest extends TestCase
@@ -15,6 +16,7 @@ class UploadProcessingTest extends TestCase
     {
         $this->tmpFile = tempnam(sys_get_temp_dir(), 'testUpload');
         file_put_contents($this->tmpFile, 'Content');
+        $this->filesystem = new Filesystem(new InMemoryFilesystemAdapter());
     }
 
     public function tearDown(): void
@@ -24,50 +26,44 @@ class UploadProcessingTest extends TestCase
         }
     }
 
-    public function testUpload()
+
+    public function testUploadInSubDirectory()
     {
-        $filesystem = $this->getMockBuilder(Filesystem::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $filesystem->expects($this->atLeast(3))->method('writeStream');
-
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
-        $file = new UploadProcessing($uploadedFile, $filesystem);
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
+        $file->upload('memory');
+        $this->assertSame('memory/original_file_name.txt', $file->getTargetPath());
+        $this->assertSame('Content', $this->filesystem->read($file->getTargetPath()));
+    }
 
-        $this->assertSame(null, $file->getTargetPath());
-
-        $file->upload('test');
-        $this->assertSame('test/original_file_name.txt', $file->getTargetPath());
-
-        $file->upload('test/');
-        $this->assertSame('test/original_file_name.txt', $file->getTargetPath());
-
+    public function testUploadInRootDirectory()
+    {
+        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
         $file->upload();
         $this->assertSame('/original_file_name.txt', $file->getTargetPath());
+        $this->assertSame('Content', $this->filesystem->read($file->getTargetPath()));
     }
 
     public function testGetUploadedFile()
     {
-        $filesystem = $this->getMockBuilder(Filesystem::class)->disableOriginalConstructor()->getMock();
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
-        $file = new UploadProcessing($uploadedFile, $filesystem);
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
         $this->assertSame($uploadedFile, $file->getUploadedFile());
     }
 
 
     public function testGetFilesystem()
     {
-        $filesystem = $this->getMockBuilder(Filesystem::class)->disableOriginalConstructor()->getMock();
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
-        $file = new UploadProcessing($uploadedFile, $filesystem);
-        $this->assertSame($filesystem, $file->getFilesystem());
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
+        $this->assertSame($this->filesystem, $file->getFilesystem());
     }
 
     public function testSetFilename()
     {
-        $filesystem = $this->getMockBuilder(Filesystem::class)->disableOriginalConstructor()->getMock();
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
-        $file = new UploadProcessing($uploadedFile, $filesystem);
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
         $file->setFilename('test');
         $this->assertSame('test.txt', $file->getFileInfo()->getFilename());
         $this->assertSame('test', $file->getFileInfo()->getFilenameWithoutExtension());
