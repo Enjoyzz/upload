@@ -15,7 +15,6 @@ class FileInfoTest extends TestCase
     {
         $this->tmpFile = tempnam(sys_get_temp_dir(), 'testUpload');
         file_put_contents($this->tmpFile, 'Content');
-        $file = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
     }
 
     public function tearDown(): void

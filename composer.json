@@ -35,6 +35,8 @@
         }
     },
     "scripts": {
-        "psalm": "./vendor/bin/psalm"
+        "psalm": "./vendor/bin/psalm",
+        "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit"
+
     }
 }
