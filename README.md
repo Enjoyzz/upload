@@ -7,7 +7,7 @@ use Psr\Http\Message\ServerRequestInterface;
 /** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
 /** @var \League\Flysystem\Filesystem $filesystem */
 
-$file = new \Enjoys\Upload\UploadProcessing($uploadedFile, $storage);
+$file = new \Enjoys\Upload\UploadProcessing($uploadedFile, $filesystem);
 $file->setFilename('new_file_name');
 try {
     $file->upload();       
