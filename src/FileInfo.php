@@ -12,7 +12,7 @@ final class FileInfo
 {
     private string $filename;
     private string $originalFilename;
-    private string $mimeType;
+    private string $mediaType;
     private string $extension;
     private int $size;
 
@@ -20,7 +20,7 @@ final class FileInfo
     {
         $this->filename = $this->originalFilename = $file->getClientFilename() ?? '';
 
-        $this->mimeType = $file->getClientMediaType() ?? '';
+        $this->mediaType = $file->getClientMediaType() ?? '';
 
         $this->extension = pathinfo(
             $file->getClientFilename() ?? '',
@@ -32,7 +32,11 @@ final class FileInfo
 
     public function getFilenameWithoutExtension(): string
     {
-        return rtrim($this->filename, $this->getExtensionWithDot());
+        return preg_replace(
+            sprintf('/%s$/', preg_quote($this->getExtensionWithDot())),
+            '',
+            $this->filename
+        );
     }
 
 
@@ -48,7 +52,11 @@ final class FileInfo
      */
     public function setFilename(string $filename): void
     {
-        $this->filename = rtrim($filename, $this->getExtensionWithDot()) . $this->getExtensionWithDot();
+        $this->filename = preg_replace(
+                sprintf('/%s$/', preg_quote($this->getExtensionWithDot())),
+                '',
+                $filename
+            ) . $this->getExtensionWithDot();
     }
 
     public function getFilename(): string
@@ -56,9 +64,9 @@ final class FileInfo
         return $this->filename;
     }
 
-    public function getMimeType(): string
+    public function getMediaType(): string
     {
-        return $this->mimeType;
+        return $this->mediaType;
     }
 
     public function getOriginalFilename(): string
