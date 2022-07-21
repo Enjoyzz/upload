@@ -22,7 +22,8 @@
     },
     "require-dev": {
         "vimeo/psalm": "^4.24",
-        "phpunit/phpunit": "^9.5"
+        "phpunit/phpunit": "^9.5",
+        "infection/infection": "^0.26"
     },
     "autoload": {
         "psr-4": {
@@ -36,7 +37,15 @@
     },
     "scripts": {
         "psalm": "./vendor/bin/psalm",
-        "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit"
-
+        "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit",
+        "infection": [
+            "Composer\\Config::disableProcessTimeout",
+            "XDEBUG_MODE=coverage ./vendor/bin/infection -j2"
+        ]
+    },
+    "config": {
+        "allow-plugins": {
+            "infection/extension-installer": true
+        }
     }
 }
