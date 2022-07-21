@@ -1,29 +1,31 @@
 # Example
 
 ```php
-use Enjoys\Upload\File;
-use Enjoys\Upload\Storage\FileSystem;
+
 use Psr\Http\Message\ServerRequestInterface;
 
-/** @var ServerRequestInterface $request */
-$uploadedFile = $request->getUploadedFiles()['my_file'];
-$storage = new FileSystem('/tmp/upload');
-$file = new File($uploadedFile, $storage);
+/** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
+/** @var \League\Flysystem\Filesystem $filesystem */
+
+$file = new \Enjoys\Upload\UploadProcessing($uploadedFile, $storage);
 $file->setFilename('new_file_name');
 try {
-    $targetPath = $file->upload();
-    /*
-     * $targetPath - full path to uploaded file
-     * $file->getFilename(); - return full file name, ex.  `new_file_name.jpg`
-     * $file->getFilenameWithoutExtension(); - return file name without extension, ex.  `new_file_name`
-     * $file->getExtension(); - return extension, ex.  `jpg`
-     * $file->getExtensionWithDot(); - return extension with dot before, ex.  `.jpg`
-     * $file->getSize(); - return file size in bytes, ex.  `102435`
-     * $file->getOriginalFilename(); - return original file name, ex.  `original_file_name.jpg`
-     * $file->getMimeType(); - return mime type, determine by client extension, ex.  `image/jpg`
-     * $file->getUploadedFile(); - return object `\Psr\Http\Message\UploadedFileInterface`
-     */
+    $file->upload();       
 }catch (\Exception $e){
     // handle exception
 }
+
+// Public methods
+$file->getTargetPath(); // before upload null, after string
+$file->getFilesystem(); // return object \League\Flysystem\Filesystem
+$file->getUploadedFile(); // return object \Psr\Http\Message\UploadedFileInterface
+
+$fileInfo = $file->getFileInfo(); // return object \Enjoys\Upload\FileInfo 
+$fileInfo->getExtension(); // return extension, ex.  `jpg`
+$fileInfo->getFilename(); // return full file name, ex.  `new_file_name.jpg`
+$fileInfo->getOriginalFilename(); // return original file name, ex.  `original_file_name.jpg`
+$fileInfo->getMimeType(); // return mime type, determine by client extension, ex.  `image/jpg`
+$fileInfo->getSize(); // return file size in bytes, ex.  `102435`
+$fileInfo->getExtensionWithDot(); // return extension with dot before, ex.  `.jpg`
+$fileInfo->getFilenameWithoutExtension(); // return file name without extension, ex.  `new_file_name`
 ```
