@@ -60,14 +60,20 @@ try {
 ## Extension Rule
 
 Allowed extension case-insensitive
+
 ```php
 $rule = new \Enjoys\Upload\Rule\Extension();
 $rule->allow('png');
 // or
 $rule->allow('png, jpg');
 // or
-$rule->allow([
-    'png',
-    'jpg'
-]);
+$rule->allow(['png','jpg']);
+```
+
+## Size Rule
+
+```php
+$rule = new \Enjoys\Upload\Rule\Size();
+$rule->setMaxSize(10*1024*1024); // in bytes
+$rule->setMinSize(1*1024*1024); // in bytes
 ```
