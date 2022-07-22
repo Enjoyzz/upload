@@ -32,11 +32,7 @@ final class FileInfo
 
     public function getFilenameWithoutExtension(): string
     {
-        return preg_replace(
-            sprintf('/%s$/', preg_quote($this->getExtensionWithDot())),
-            '',
-            $this->filename
-        );
+        return $this->removeExtension($this->filename);
     }
 
 
@@ -52,11 +48,7 @@ final class FileInfo
      */
     public function setFilename(string $filename): void
     {
-        $this->filename = preg_replace(
-                sprintf('/%s$/', preg_quote($this->getExtensionWithDot())),
-                '',
-                $filename
-            ) . $this->getExtensionWithDot();
+        $this->filename = $this->removeExtension($filename) . $this->getExtensionWithDot();
     }
 
     public function getFilename(): string
@@ -83,6 +75,19 @@ final class FileInfo
     public function getSize(): int
     {
         return $this->size;
+    }
+
+    /**
+     * @param string $filename
+     * @return string
+     */
+    private function removeExtension(string $filename): string
+    {
+        return preg_replace(
+            sprintf('/%s$/', preg_quote($this->getExtensionWithDot())),
+            '',
+            $filename
+        );
     }
 
 
