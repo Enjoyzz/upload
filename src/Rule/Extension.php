@@ -18,7 +18,7 @@ use function strtolower;
 
 final class Extension implements RuleInterface
 {
-    private ?string $errorMessage;
+    private string $errorMessage;
     private array $allowed = [];
 
     public function __construct(string $errorMessage = null)
