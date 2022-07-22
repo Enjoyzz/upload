@@ -8,13 +8,15 @@ use Psr\Http\Message\ServerRequestInterface;
 /** @var \League\Flysystem\Filesystem $filesystem */
 
 $file = new \Enjoys\Upload\UploadProcessing($uploadedFile, $filesystem);
-$file->setFilename('new_file_name');
+$file->setFilename('myFile');
 try {
     $file->upload();       
 }catch (\Exception $e){
     // handle exception
 }
+```
 
+```php
 // Public methods
 $file->getTargetPath(); // before upload null, after string
 $file->getFilesystem(); // return object \League\Flysystem\Filesystem
@@ -28,4 +30,44 @@ $fileInfo->getMediaType(); // return media type, determine by client extension, 
 $fileInfo->getSize(); // return file size in bytes, ex.  `102435`
 $fileInfo->getExtensionWithDot(); // return extension with dot before, ex.  `.jpg`
 $fileInfo->getFilenameWithoutExtension(); // return file name without extension, ex.  `new_file_name`
+```
+
+# Validation
+
+```php
+use Psr\Http\Message\ServerRequestInterface;
+
+/** @var \Psr\Http\Message\UploadedFileInterface $uploadedFile */
+/** @var \League\Flysystem\Filesystem $filesystem */
+
+$file = new \Enjoys\Upload\UploadProcessing($uploadedFile, $filesystem);
+
+
+/** @var \Enjoys\Upload\RuleInterface $rule */
+$file->addRule($rule);
+
+// or
+/** @var \Enjoys\Upload\RuleInterface[] $rules */
+$file->addRules($rules);
+
+try {
+    $file->upload();       
+}catch (\Exception $e){
+    // handle exception
+}
+```
+
+## Extension Rule
+
+Allowed extension case-insensitive
+```php
+$rule = new \Enjoys\Upload\Rule\Extension();
+$rule->allow('png');
+// or
+$rule->allow('png, jpg');
+// or
+$rule->allow([
+    'png',
+    'jpg'
+]);
 ```

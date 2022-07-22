@@ -14,6 +14,13 @@ final class UploadProcessing
     private ?string $targetPath = null;
     private FileInfo $fileInfo;
 
+    private bool $validate = true;
+
+    /**
+     * @var RuleInterface[]
+     */
+    private array $rules = [];
+
     public function __construct(private UploadedFileInterface $uploadedFile, private Filesystem $filesystem)
     {
         $this->fileInfo = new FileInfo($uploadedFile);
@@ -24,6 +31,10 @@ final class UploadProcessing
      */
     public function upload(string $targetPath = '/'): void
     {
+        if ($this->validate){
+            $this->validate();
+        }
+
         $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
         $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
     }
@@ -63,5 +74,38 @@ final class UploadProcessing
     {
         return $this->fileInfo;
     }
+
+
+    public function addRule(RuleInterface $rule): void
+    {
+        $this->rules[] = $rule;
+    }
+
+    /**
+     * @param RuleInterface[] $rules
+     * @return void
+     */
+    public function addRules(array $rules): void
+    {
+        $this->rules[] = array_merge($this->rules, $rules);
+    }
+
+    private function validate(): void
+    {
+        foreach ($this->rules as $rule) {
+            $rule->check($this->getUploadedFile());
+        }
+    }
+
+    public function isValidate(): bool
+    {
+        return $this->validate;
+    }
+
+    public function setValidate(bool $validate): void
+    {
+        $this->validate = $validate;
+    }
+
 
 }
