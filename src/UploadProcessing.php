@@ -29,10 +29,19 @@ final class UploadProcessing
      */
     public function upload(string $targetPath = '/'): void
     {
+
         $this->validate();
 
         $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
         $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
+    }
+
+    private function validate(): void
+    {
+        foreach ($this->rules as $rule) {
+            $rule->check($this->getUploadedFile());
+        }
+
     }
 
     /**
@@ -85,14 +94,6 @@ final class UploadProcessing
     {
         $this->rules = array_merge($this->rules, $rules);
     }
-
-    private function validate(): void
-    {
-        foreach ($this->rules as $rule) {
-            $rule->check($this->getUploadedFile());
-        }
-    }
-
 
     /**
      * @return RuleInterface[]
