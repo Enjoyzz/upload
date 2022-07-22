@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Enjoys\Tests\Upload;
 
+use Enjoys\Upload\Rule\Extension;
+use Enjoys\Upload\RuleInterface;
 use Enjoys\Upload\UploadProcessing;
 use GuzzleHttp\Psr7\UploadedFile;
 use League\Flysystem\Filesystem;
@@ -67,5 +69,23 @@ class UploadProcessingTest extends TestCase
         $file->setFilename('test');
         $this->assertSame('test.txt', $file->getFileInfo()->getFilename());
         $this->assertSame('test', $file->getFileInfo()->getFilenameWithoutExtension());
+    }
+
+    public function testAddRule()
+    {
+        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
+        $file->addRule($this->getMockForAbstractClass(RuleInterface::class));
+        $this->assertCount(1, $file->getRules());
+    }
+
+    public function testAddRules()
+    {
+        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
+        $rules = array_fill(0, 3, $this->getMockForAbstractClass(RuleInterface::class));
+        $file->addRule($this->getMockForAbstractClass(RuleInterface::class));
+        $file->addRules($rules);
+        $this->assertCount(4, $file->getRules());
     }
 }
