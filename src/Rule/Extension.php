@@ -23,7 +23,7 @@ final class Extension implements RuleInterface
 
     public function __construct(string $errorMessage = null)
     {
-        $this->errorMessage = $errorMessage ?? 'Загрузка файлов с расширением %s запрещена';
+        $this->errorMessage = $errorMessage ?? 'Files with the %s extension are not allowed';
     }
 
     /**

@@ -28,7 +28,7 @@ class ExtensionTest extends TestCase
     {
         $this->expectException(RuleException::class);
         $this->expectExceptionMessage(
-            'Загрузка файлов с расширением png запрещена'
+            'Files with the png extension are not allowed'
         );
         $file = new UploadedFile(
             $this->tmpFile,
@@ -80,7 +80,7 @@ class ExtensionTest extends TestCase
     {
         $this->expectException(RuleException::class);
         $this->expectExceptionMessage(
-            'Загрузка файлов с расширением jpg запрещена'
+            'Files with the jpg extension are not allowed'
         );
         $file = new UploadedFile(
             $this->tmpFile,
@@ -94,6 +94,24 @@ class ExtensionTest extends TestCase
             'jpeg',
             'png'
         ]);
+        $rule->check($file);
+    }
+
+    public function testWithCustomMessage()
+    {
+        $this->expectException(RuleException::class);
+        $this->expectExceptionMessage(
+            'The png extension are not allowed'
+        );
+        $file = new UploadedFile(
+            $this->tmpFile,
+            128,
+            UPLOAD_ERR_OK,
+            clientFilename: $originalFilename = 'file.png'
+        );
+
+        $rule = new Extension('The %s extension are not allowed');
+        $rule->allow('txt');
         $rule->check($file);
     }
 

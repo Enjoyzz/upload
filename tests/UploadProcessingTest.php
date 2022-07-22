@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Enjoys\Tests\Upload;
 
+use Enjoys\Upload\Exception\RuleException;
 use Enjoys\Upload\Rule\Extension;
 use Enjoys\Upload\RuleInterface;
 use Enjoys\Upload\UploadProcessing;
@@ -45,6 +46,33 @@ class UploadProcessingTest extends TestCase
         $file->upload();
         $this->assertSame('/original_file_name.txt', $file->getTargetPath());
         $this->assertSame('Content', $this->filesystem->read($file->getTargetPath()));
+    }
+
+
+    public function testUploadWithValidateSuccess()
+    {
+        $rule = $this->getMockForAbstractClass(RuleInterface::class);
+        $rule->expects($this->once())->method('check');
+        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK);
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
+        $file->addRule($rule);
+        $file->upload();
+    }
+
+    public function testUploadWithValidateFailed()
+    {
+
+        $this->expectExceptionMessage($errorMessage = 'error');
+        $this->expectException(RuleException::class);
+
+        $rule = $this->getMockForAbstractClass(RuleInterface::class);
+        $rule->expects($this->once())->method('check')->willThrowException(new RuleException($errorMessage));
+        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK);
+        $file = new UploadProcessing($uploadedFile, $this->filesystem);
+        $file->addRule($rule);
+
+        $file->upload();
+
     }
 
     public function testGetUploadedFile()
