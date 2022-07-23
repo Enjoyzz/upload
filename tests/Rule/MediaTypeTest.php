@@ -26,22 +26,22 @@ class MediaTypeTest extends TestCase
         }
     }
 
-//    /**
-//     * @doesNotPerformAssertions
-//     */
-//    public function testCheckSuccess()
-//    {
-//        $file = new UploadedFile(
-//            $this->tmpFile,
-//            null,
-//            UPLOAD_ERR_OK,
-//            clientMediaType: 'image/png'
-//        );
-//
-//        $rule = new MediaType();
-//        $rule->allow('image/*');
-//        $rule->check($file);
-//    }
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testCheckSuccess()
+    {
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK,
+            clientMediaType: 'image/png'
+        );
+
+        $rule = new MediaType();
+        $rule->allow('image/*');
+        $rule->check($file);
+    }
 
     public function testAllowSuccess()
     {

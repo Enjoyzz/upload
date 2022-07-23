@@ -20,16 +20,29 @@ final class MediaType implements RuleInterface
 
     public function __construct(string $errorMessage = null)
     {
-        $this->errorMessage = $errorMessage ?? 'The Error Message Media Type';
+        $this->errorMessage = $errorMessage ?? 'Media type is disallow: `%s`';
     }
 
     public function check(UploadedFileInterface $file): void
     {
-        $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media Type ins null');
+        if (in_array('*', array_keys($this->allowedMediaType))) {
+            return;
+        }
 
-//        if (!in_array($mediaType, $this->allowedMediaType, true)){
-        throw new RuleException(sprintf($this->errorMessage, $mediaType));
-//        }
+        $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media Type ins null');
+        list($type, $subType) = $this->explode($mediaType);
+
+        if (!in_array($type, array_keys($this->allowedMediaType), true)) {
+            throw new RuleException(sprintf($this->errorMessage, $mediaType));
+        }
+
+        if (($this->allowedMediaType[$type] ?? []) === '*'){
+            return;
+        }
+
+        if (!in_array($subType, $this->allowedMediaType[$type] ?? [], true)) {
+            throw new RuleException(sprintf($this->errorMessage, $mediaType));
+        }
     }
 
     public function allow(string $string): MediaType
