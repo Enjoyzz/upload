@@ -23,14 +23,16 @@ final class Size implements RuleInterface
         $this->errorLessMessage = $errorLessMessage ?? 'File size is too small (%3$s, %4$s bytes). Must be greater than or equal to: %1$s (%2$s bytes)';
     }
 
-    public function setMaxSize(int $maxSize): void
+    public function setMaxSize(int $maxSize): Size
     {
         $this->maxSize = $maxSize;
+        return $this;
     }
 
-    public function setMinSize(int $minSize): void
+    public function setMinSize(int $minSize): Size
     {
         $this->minSize = $minSize;
+        return $this;
     }
 
     public function check(UploadedFileInterface $file): void
