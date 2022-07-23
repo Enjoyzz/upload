@@ -11,12 +11,10 @@ use Psr\Http\Message\UploadedFileInterface;
 final class MediaType implements RuleInterface
 {
 
-    /*
-     * image => [jpg, png]
-     * application => *
-     */
+
     private array $allowedMediaType = [];
     private string $errorMessage;
+    private bool $allowedAllMediaType = false;
 
     public function __construct(string $errorMessage = null)
     {
@@ -27,10 +25,9 @@ final class MediaType implements RuleInterface
     {
         $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media Type ins null');
 
-        if (in_array('*', array_keys($this->allowedMediaType))) {
+        if ($this->allowedAllMediaType) {
             return;
         }
-
 
         list($type, $subType) = $this->explode($mediaType);
 
@@ -38,11 +35,11 @@ final class MediaType implements RuleInterface
             throw new RuleException(sprintf($this->errorMessage, $mediaType));
         }
 
-        if (($this->allowedMediaType[$type] ?? []) === '*'){
+        if (($this->allowedMediaType[$type] ?? []) === '*') {
             return;
         }
 
-        if (!in_array($subType, $this->allowedMediaType[$type] ?? [], true)) {
+        if (!in_array($subType, (array)($this->allowedMediaType[$type] ?? []), true)) {
             throw new RuleException(sprintf($this->errorMessage, $mediaType));
         }
     }
@@ -56,12 +53,13 @@ final class MediaType implements RuleInterface
         list($type, $subType) = $this->explode($string);
 
         if ($type === '*') {
-            $this->allowedMediaType = ['*' => '*'];
+            $this->allowedAllMediaType = true;
             return $this;
         }
 
         /** @var string[]|string $allowType */
         $allowType = $this->allowedMediaType[$type] ?? [];
+
 
         if ($allowType === '*') {
             return $this;
@@ -82,7 +80,7 @@ final class MediaType implements RuleInterface
     }
 
 
-    public function getAllowedMediaType(): array
+    public function getAllowedMediaType(): array|string
     {
         return $this->allowedMediaType;
     }

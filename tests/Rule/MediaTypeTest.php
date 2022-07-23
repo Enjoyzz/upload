@@ -84,6 +84,22 @@ class MediaTypeTest extends TestCase
         $this->assertTrue(true);
     }
 
+    public function testCheckFailedIfManyAllowed()
+    {
+        $this->expectExceptionMessage('Media type is disallow: `plain/text`');
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK,
+            clientMediaType: 'plain/text'
+        );
+
+        $rule = new MediaType();
+        $rule->allow('image/jpg')
+            ->allow('image/png');
+        $rule->check($file);
+    }
+
     public function testAllowSuccess()
     {
         $rule = new MediaType();
@@ -137,7 +153,9 @@ class MediaTypeTest extends TestCase
 
         $rule->allow('*/bmp');
         $this->assertSame([
-            '*' => '*',
+            'example' => ['example'],
+            'image' => '*',
+            'application' => ['json']
         ], $rule->getAllowedMediaType());
     }
 
@@ -177,4 +195,21 @@ class MediaTypeTest extends TestCase
     }
 
 
+    public function testWithCustomMessage()
+    {
+        $this->expectException(RuleException::class);
+        $this->expectExceptionMessage(
+            'The video/avi-mime type is wrong'
+        );
+        $file = new UploadedFile(
+            $this->tmpFile,
+            11,
+            UPLOAD_ERR_OK,
+            clientMediaType: 'video/avi'
+        );
+
+        $rule = new MediaType('The %s-mime type is wrong');
+        $rule->allow('video/mpeg');
+        $rule->check($file);
+    }
 }
