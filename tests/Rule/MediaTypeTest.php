@@ -86,6 +86,18 @@ class MediaTypeTest extends TestCase
             'image' => '*',
             'application' => ['json']
         ], $rule->getAllowedMediaType());
+
+        $rule->allow('image/bmp');
+        $this->assertSame([
+            'example' => ['example'],
+            'image' => '*',
+            'application' => ['json']
+        ], $rule->getAllowedMediaType());
+
+        $rule->allow('*/bmp');
+        $this->assertSame([
+            '*' => '*',
+        ], $rule->getAllowedMediaType());
     }
 
     public function dataForAllowFailed()

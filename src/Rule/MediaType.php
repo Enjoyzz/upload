@@ -40,6 +40,11 @@ final class MediaType implements RuleInterface
 
         list($type, $subType) = $this->explode($string);
 
+        if ($type === '*') {
+            $this->allowedMediaType = ['*' => '*'];
+            return $this;
+        }
+
         /** @var string[]|string $allowType */
         $allowType = $this->allowedMediaType[$type] ?? [];
 
