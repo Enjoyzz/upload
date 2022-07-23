@@ -26,10 +26,8 @@ class MediaTypeTest extends TestCase
         }
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
-    public function testCheckSuccess()
+
+    public function testCheckSuccessIfAllSubTypeIsAllowed()
     {
         $file = new UploadedFile(
             $this->tmpFile,
@@ -41,6 +39,49 @@ class MediaTypeTest extends TestCase
         $rule = new MediaType();
         $rule->allow('image/*');
         $rule->check($file);
+
+        // Tests without assertions does not generate coverage #3016
+        // https://github.com/sebastianbergmann/phpunit/issues/3016
+        $this->assertTrue(true);
+    }
+
+
+    public function testCheckSuccessIfAllTypeIsAllowed()
+    {
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK,
+            clientMediaType: 'image/png'
+        );
+
+        $rule = new MediaType();
+        $rule->allow('*/example');
+        $rule->check($file);
+
+        // Tests without assertions does not generate coverage #3016
+        // https://github.com/sebastianbergmann/phpunit/issues/3016
+        $this->assertTrue(true);
+    }
+
+
+    public function testCheckSuccessIfManyAllowed()
+    {
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK,
+            clientMediaType: 'image/png'
+        );
+
+        $rule = new MediaType();
+        $rule->allow('image/jpg')
+        ->allow('image/png');
+        $rule->check($file);
+
+        // Tests without assertions does not generate coverage #3016
+        // https://github.com/sebastianbergmann/phpunit/issues/3016
+        $this->assertTrue(true);
     }
 
     public function testAllowSuccess()
@@ -100,6 +141,20 @@ class MediaTypeTest extends TestCase
         ], $rule->getAllowedMediaType());
     }
 
+    public function testCheckFailedIfMediaTypeIsNull()
+    {
+        $this->expectExceptionMessage('Media Type ins null');
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK,
+            clientMediaType: null
+        );
+
+        $rule = new MediaType();
+        $rule->check($file);
+    }
+
     public function dataForAllowFailed()
     {
         return [
@@ -107,6 +162,7 @@ class MediaTypeTest extends TestCase
             ['image/ png'],
             ['image/'],
             ['/png'],
+            ['image'],
         ];
     }
 
@@ -119,4 +175,6 @@ class MediaTypeTest extends TestCase
         $rule = new MediaType();
         $rule->allow($mediaType);
     }
+
+
 }

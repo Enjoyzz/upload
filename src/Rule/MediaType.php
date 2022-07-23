@@ -25,11 +25,13 @@ final class MediaType implements RuleInterface
 
     public function check(UploadedFileInterface $file): void
     {
+        $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media Type ins null');
+
         if (in_array('*', array_keys($this->allowedMediaType))) {
             return;
         }
 
-        $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media Type ins null');
+
         list($type, $subType) = $this->explode($mediaType);
 
         if (!in_array($type, array_keys($this->allowedMediaType), true)) {
