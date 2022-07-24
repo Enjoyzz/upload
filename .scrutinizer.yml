@@ -1,0 +1,28 @@
+build:
+  environment:
+    php:
+      version: 8.0
+  nodes:
+    analysis:
+      project_setup:
+        override:
+          - 'true'
+      tests:
+        override:
+          - php-scrutinizer-run
+          - command: XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover ./build/logs/clover.xml
+            coverage:
+              file: ./build/logs/clover.xml   # <- Set this to where we find the coverage data.
+              #    The path is relative to the current directory.
+              format: clover
+filter:
+  excluded_paths:
+    - 'tests/*'
+    - 'example/*'
+checks:
+  php: true
+coding_style:
+  php:
+    spaces:
+      around_operators:
+        concatenation: true
