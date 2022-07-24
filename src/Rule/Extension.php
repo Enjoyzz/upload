@@ -26,17 +26,20 @@ final class Extension implements RuleInterface
         $this->errorMessage = $errorMessage ?? 'Files with the %s extension are not allowed';
     }
 
+
     /**
      * @param string|string[] $extension
-     * @return void
+     * @return $this
      */
-    public function allow(array|string $extension): void
+    public function allow(array|string $extension): Extension
     {
         if (is_string($extension)){
             $extension = explode(",", $extension);
         }
 
         $this->allowed = array_map('trim', array_map('strtolower', $extension));
+
+        return $this;
     }
 
     public function check(UploadedFileInterface $file): void

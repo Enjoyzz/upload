@@ -35,6 +35,7 @@ try {
 ### Validation
 
 Currently, there are 2 validation rules:
+
 - Extension (Enjoys\Upload\Rule\Extension)
 - Size (Enjoys\Upload\Rule\Size)
 - MediaType (Enjoys\Upload\Rule\MediaType)
@@ -48,7 +49,7 @@ $file->addRule($rule);
 $file->upload(); 
 ```
 
-#### Extension Rule 
+#### Extension Rule
 
 Allowed extension case-insensitive
 
@@ -65,8 +66,8 @@ $rule->allow(['png','jpg']);
 
 ```php
 $rule = new Enjoys\Upload\Rule\Size();
-$rule->setMaxSize(10*1024*1024); // in bytes
-$rule->setMinSize(1*1024*1024); // in bytes
+$rule->setMaxSize(10*1024*1024)
+->setMinSize(1*1024*1024); // in bytes
 ```
 
 #### MediaType Rule
@@ -78,7 +79,6 @@ $rule->allow('image/*')
      // ...
     ;
 ```
-
 
 ### Methods
 
@@ -122,7 +122,8 @@ $file->upload(); // $file->upload('sub_directory');
 
 **getTargetPath()**
 
-_Called after upload_. Something like a location in the file system is returned. If called before upload, returns `null`.
+_Called after upload_. Something like a location in the file system is returned. If called before upload, returns `null`
+.
 
 ```php
 /** @var Enjoys\Upload\UploadProcessing $file */
@@ -176,7 +177,6 @@ Returns original filename, ex.  `original_file_name.jpg`
 $file->getOriginalFilename();
 ```
 
-
 **getFilenameWithoutExtension()**
 
 Returns filename without extension, ex.  `new_file_name`
@@ -185,7 +185,6 @@ Returns filename without extension, ex.  `new_file_name`
 /** @var Enjoys\Upload\UploadProcessing $file */
 $file->getFilenameWithoutExtension();
 ```
-
 
 **getExtension()**
 
