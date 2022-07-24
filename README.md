@@ -34,7 +34,7 @@ try {
 
 ### Validation
 
-Currently, there are 2 validation rules:
+Currently there are *3 validation rules*, but if a specific validation is needed, you can write a rule by implementing the Enjoys\Upload\RuleInterface interface:
 
 - Extension (Enjoys\Upload\Rule\Extension)
 - Size (Enjoys\Upload\Rule\Size)
