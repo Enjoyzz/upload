@@ -197,6 +197,9 @@ class MediaTypeTest extends TestCase
             ['image/'],
             ['/png'],
             ['image'],
+            ['*'],
+            ['*/'],
+            ['/*'],
         ];
     }
 
