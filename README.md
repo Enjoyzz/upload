@@ -1,6 +1,13 @@
 Upload
 ==========
 
+[![Mutation testing badge](https://img.shields.io/endpoint?style=flat&url=https%3A%2F%2Fbadge-api.stryker-mutator.io%2Fgithub.com%2FEnjoyzz%2Fupload%2Fmaster)](https://dashboard.stryker-mutator.io/reports/github.com/Enjoyzz/upload/master)
+[![tests](https://github.com/Enjoyzz/upload/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/Enjoyzz/upload/actions/workflows/tests.yml)
+[![static](https://github.com/Enjoyzz/upload/actions/workflows/static.yml/badge.svg?branch=master)](https://github.com/Enjoyzz/upload/actions/workflows/static.yml)
+[![Build Status](https://scrutinizer-ci.com/g/Enjoyzz/upload/badges/build.png?b=master)](https://scrutinizer-ci.com/g/Enjoyzz/upload/build-status/master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Enjoyzz/upload/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Enjoyzz/upload/?branch=master)
+[![Code Coverage](https://scrutinizer-ci.com/g/Enjoyzz/upload/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/Enjoyzz/upload/?branch=master)
+
 File uploads library with validation
 uses [PSR-7 UploadedFileInterface](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-7-http-message.md#16-uploaded-files)
 and [League\Flysystem](https://github.com/thephpleague/flysystem) as a file storage library
