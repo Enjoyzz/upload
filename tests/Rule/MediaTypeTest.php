@@ -84,14 +84,30 @@ class MediaTypeTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function testCheckFailedIfManyAllowed()
+    public function testCheckFailedIfManyAllowedButTypeNotSet()
     {
-        $this->expectExceptionMessage('Media type is disallow: `plain/text`');
+        $this->expectExceptionMessage('Media type is disallow: `plain/*`');
         $file = new UploadedFile(
             $this->tmpFile,
             null,
             UPLOAD_ERR_OK,
-            clientMediaType: 'plain/text'
+            clientMediaType: 'plain/jpg'
+        );
+
+        $rule = new MediaType();
+        $rule->allow('image/jpg')
+            ->allow('image/png');
+        $rule->check($file);
+    }
+
+    public function testCheckFailedIfManyAllowedButTypeAndSubTypeNotSet()
+    {
+        $this->expectExceptionMessage('Media type is disallow: `image/svg`');
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK,
+            clientMediaType: 'image/svg'
         );
 
         $rule = new MediaType();

@@ -32,7 +32,7 @@ final class MediaType implements RuleInterface
         list($type, $subType) = $this->explode($mediaType);
 
         if (!in_array($type, array_keys($this->allowedMediaType), true)) {
-            throw new RuleException(sprintf($this->errorMessage, $mediaType));
+            throw new RuleException(sprintf($this->errorMessage, sprintf('%s/*', $type)));
         }
 
         if (($this->allowedMediaType[$type] ?? []) === '*') {
