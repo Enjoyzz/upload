@@ -37,6 +37,7 @@ try {
 Currently, there are 2 validation rules:
 - Extension (Enjoys\Upload\Rule\Extension)
 - Size (Enjoys\Upload\Rule\Size)
+- MediaType (Enjoys\Upload\Rule\MediaType)
 
 ```php
 /** @var Enjoys\Upload\UploadProcessing $file */
@@ -52,7 +53,7 @@ $file->upload();
 Allowed extension case-insensitive
 
 ```php
-$rule = new \Enjoys\Upload\Rule\Extension();
+$rule = new Enjoys\Upload\Rule\Extension();
 $rule->allow('png');
 // or
 $rule->allow('png, jpg');
@@ -63,9 +64,19 @@ $rule->allow(['png','jpg']);
 #### Size Rule
 
 ```php
-$rule = new \Enjoys\Upload\Rule\Size();
+$rule = new Enjoys\Upload\Rule\Size();
 $rule->setMaxSize(10*1024*1024); // in bytes
 $rule->setMinSize(1*1024*1024); // in bytes
+```
+
+#### MediaType Rule
+
+```php
+$rule = new Enjoys\Upload\Rule\MediaType();
+$rule->allow('image/*')
+     ->allow('application/pdf')
+     // ...
+    ;
 ```
 
 
