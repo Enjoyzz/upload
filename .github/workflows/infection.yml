@@ -34,14 +34,14 @@ jobs:
       uses: actions/cache@v2
       with:
         path: vendor
-        key: ${{ runner.os }}-v2-php-${{ hashFiles('**/composer.lock') }}
+        key: ${{ runner.os }}-inf-v2-php-${{ hashFiles('**/composer.lock') }}
         restore-keys: |
-          ${{ runner.os }}-v2-php-
-          
+          ${{ runner.os }}-inf-v2-php-
+
     - name: Install dependencies
       if: steps.composer-cache.outputs.cache-hit != 'true'
       run: composer install --prefer-dist --no-progress --no-suggest
-      
+
     - name: Run infection
       run: |
         vendor/bin/infection -j2 --ignore-msi-with-no-mutations --only-covered
