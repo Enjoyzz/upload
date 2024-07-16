@@ -117,7 +117,7 @@ _Called before upload._
 ```php
 /** @var Enjoys\Upload\UploadProcessing $file */
 /** @var Enjoys\Upload\RuleInterface[] $rules */
-$file->addRule($rules);
+$file->addRules($rules);
 ```
 
 **upload(targetPath: string)**
