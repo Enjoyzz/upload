@@ -155,7 +155,7 @@ Returns `Psr\Http\Message\UploadedFileInterface::class`
 $file->getUploadedFile();
 ```
 
-**getUploadedFile()**
+**getFileInfo()**
 
 Returns `Enjoys\Upload\FileInfo::class`
 
@@ -171,8 +171,8 @@ $file->getFileInfo();
 Returns full filename, ex.  `new_file_name.jpg`
 
 ```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getFileInfo();
+/** @var Enjoys\Upload\FileInfo $fileInfo */
+$fileInfo->getFilename();
 ```
 
 **getOriginalFilename()**
@@ -180,8 +180,8 @@ $file->getFileInfo();
 Returns original filename, ex.  `original_file_name.jpg`
 
 ```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getOriginalFilename();
+/** @var Enjoys\Upload\FileInfo $fileInfo */
+$fileInfo->getOriginalFilename();
 ```
 
 **getFilenameWithoutExtension()**
@@ -189,8 +189,8 @@ $file->getOriginalFilename();
 Returns filename without extension, ex.  `new_file_name`
 
 ```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getFilenameWithoutExtension();
+/** @var Enjoys\Upload\FileInfo $fileInfo */
+$fileInfo->getFilenameWithoutExtension();
 ```
 
 **getExtension()**
@@ -198,8 +198,8 @@ $file->getFilenameWithoutExtension();
 Returns extension, ex.  `jpg`
 
 ```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getExtension();
+/** @var Enjoys\Upload\FileInfo $fileInfo */
+$fileInfo->getExtension();
 ```
 
 **getExtensionWithDot()**
@@ -207,8 +207,8 @@ $file->getExtension();
 Returns extension with dot before, ex.  `.jpg`
 
 ```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getExtensionWithDot();
+/** @var Enjoys\Upload\FileInfo $fileInfo */
+$fileInfo->getExtensionWithDot();
 ```
 
 **getSize()**
@@ -216,8 +216,8 @@ $file->getExtensionWithDot();
 Returns filesize in bytes, ex.  `102435`
 
 ```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getSize();
+/** @var Enjoys\Upload\FileInfo $fileInfo */
+$fileInfo->getSize();
 ```
 
 **getMediaType()**
@@ -225,6 +225,6 @@ $file->getSize();
 Returns media type, determine by client extension, ex.  `image/jpg`
 
 ```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getMediaType();
+/** @var Enjoys\Upload\FileInfo $fileInfo */
+$fileInfo->getMediaType();
 ```
