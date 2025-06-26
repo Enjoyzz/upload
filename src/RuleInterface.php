@@ -8,7 +8,7 @@ use Enjoys\Upload\Exception\RuleException;
 use Psr\Http\Message\UploadedFileInterface;
 
 /**
- * Interface for file upload validation rules
+ * Defines contract for file upload validation rules
  *
  * Implement this interface to create custom validation rules
  * that can be used with UploadProcessing
@@ -16,16 +16,16 @@ use Psr\Http\Message\UploadedFileInterface;
 interface RuleInterface
 {
     /**
-     * Validates an uploaded file according to the rule's requirements
+     * Validates an uploaded file against the rule's requirements
      *
      * @param UploadedFileInterface $file The uploaded file to validate
-     * @return void
-     * @throws RuleException When validation fails with a descriptive message
+     * @throws RuleException MUST be thrown when validation fails
      *
-     * @note Implementations should:
-     *       - Return silently on successful validation
-     *       - Throw RuleException with explanation on failure
-     *       - Not modify the file contents
+     * @implementation Note:
+     * - MUST return silently on successful validation
+     * - MUST throw RuleException with a descriptive message on failure
+     * - MUST NOT modify the file contents or stream state
+     * - SHOULD validate efficiently without side effects
      */
     public function check(UploadedFileInterface $file): void;
 }
