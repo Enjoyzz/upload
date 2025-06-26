@@ -16,16 +16,16 @@
         }
     ],
     "require": {
-        "php": "^8.0",
+        "php": "~8.0.0 | ~8.1.0 | ~8.2.0 | ~8.3.0 | ~8.4.0",
         "psr/http-message": "^1.0 | ^2.0",
-        "league/flysystem": "^3.0"
+        "league/flysystem": "^3.30.0"
     },
     "require-dev": {
         "vimeo/psalm": "^5.26.1",
         "phpunit/phpunit": "^9.6.23",
         "infection/infection": "^0.26.19",
-        "league/flysystem-memory": "^3.0",
-        "guzzlehttp/psr7": "^2.4"
+        "league/flysystem-memory": "^3.29.0",
+        "guzzlehttp/psr7": "^2.7.1"
     },
     "autoload": {
         "psr-4": {
