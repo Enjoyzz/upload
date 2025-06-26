@@ -39,7 +39,7 @@
     },
     "scripts": {
         "psalm": "./vendor/bin/psalm",
-        "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --coverage-clover ./build/clover.xml",
+        "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --testdox --coverage-clover ./build/clover.xml",
         "infection": [
             "Composer\\Config::disableProcessTimeout",
             "XDEBUG_MODE=coverage ./vendor/bin/infection -j2"
