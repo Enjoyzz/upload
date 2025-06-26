@@ -87,7 +87,7 @@ final class FileInfo
             sprintf('/%s$/', preg_quote($this->getExtensionWithDot())),
             '',
             $filename
-        );
+        ) ?? '';
     }
 
 
