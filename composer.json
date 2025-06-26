@@ -22,7 +22,7 @@
     },
     "require-dev": {
         "vimeo/psalm": "^5.26.1",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.6.23",
         "infection/infection": "^0.26",
         "league/flysystem-memory": "^3.0",
         "guzzlehttp/psr7": "^2.4"
