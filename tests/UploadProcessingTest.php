@@ -6,16 +6,13 @@ namespace Enjoys\Tests\Upload;
 
 use Enjoys\Upload\Exception\RuleException;
 use Enjoys\Upload\FileInfo;
-use Enjoys\Upload\Rule\Extension;
 use Enjoys\Upload\RuleInterface;
 use Enjoys\Upload\UploadProcessing;
 use GuzzleHttp\Psr7\UploadedFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
-use phpDocumentor\Reflection\File;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\DependsOnClass;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -38,6 +35,9 @@ class UploadProcessingTest extends TestCase
     }
 
 
+    /**
+     * @throws FilesystemException
+     */
     public function testUploadInSubDirectory()
     {
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
@@ -47,6 +47,9 @@ class UploadProcessingTest extends TestCase
         $this->assertSame('Content', $this->filesystem->read($file->getTargetPath()));
     }
 
+    /**
+     * @throws FilesystemException
+     */
     public function testUploadInRootDirectory()
     {
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
@@ -77,7 +80,6 @@ class UploadProcessingTest extends TestCase
      */
     public function testUploadWithValidateFailed()
     {
-
         $this->expectExceptionMessage($errorMessage = 'error');
         $this->expectException(RuleException::class);
 
@@ -88,7 +90,6 @@ class UploadProcessingTest extends TestCase
         $file->addRule($rule);
 
         $file->upload();
-
     }
 
     public function testGetUploadedFile()

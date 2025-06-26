@@ -19,8 +19,10 @@ final class UploadProcessing
      */
     private array $rules = [];
 
-    public function __construct(private UploadedFileInterface $uploadedFile, private Filesystem $filesystem)
-    {
+    public function __construct(
+        private readonly UploadedFileInterface $uploadedFile,
+        private readonly Filesystem $filesystem,
+    ) {
         $this->fileInfo = new FileInfo($uploadedFile);
     }
 
@@ -29,7 +31,6 @@ final class UploadProcessing
      */
     public function upload(string $targetPath = '/'): void
     {
-
         $this->validate();
 
         $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
@@ -41,7 +42,6 @@ final class UploadProcessing
         foreach ($this->rules as $rule) {
             $rule->check($this->getUploadedFile());
         }
-
     }
 
     /**

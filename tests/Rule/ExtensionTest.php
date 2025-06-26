@@ -30,14 +30,12 @@ class ExtensionTest extends TestCase
     public function testCheckFailed()
     {
         $this->expectException(RuleException::class);
-        $this->expectExceptionMessage(
-            'Files with the png extension are not allowed'
-        );
+        $this->expectExceptionMessage('Files with the png extension are not allowed');
         $file = new UploadedFile(
             $this->tmpFile,
             128,
             UPLOAD_ERR_OK,
-            clientFilename: $originalFilename = 'file.png'
+            clientFilename: 'file.png'
         );
 
         $rule = new Extension();
@@ -52,7 +50,7 @@ class ExtensionTest extends TestCase
             $this->tmpFile,
             128,
             UPLOAD_ERR_OK,
-            clientFilename: $originalFilename = 'file.TXT'
+            clientFilename: 'file.TXT'
         );
 
         $rule = new Extension();
@@ -67,7 +65,7 @@ class ExtensionTest extends TestCase
             $this->tmpFile,
             128,
             UPLOAD_ERR_OK,
-            clientFilename: $originalFilename = 'file.jpeg'
+            clientFilename: 'file.jpeg'
         );
 
         $rule = new Extension();
@@ -78,14 +76,12 @@ class ExtensionTest extends TestCase
     public function testCheckFailedWithManyAllowed()
     {
         $this->expectException(RuleException::class);
-        $this->expectExceptionMessage(
-            'Files with the jpg extension are not allowed'
-        );
+        $this->expectExceptionMessage('Files with the jpg extension are not allowed');
         $file = new UploadedFile(
             $this->tmpFile,
             128,
             UPLOAD_ERR_OK,
-            clientFilename: $originalFilename = 'file.JPG'
+            clientFilename: 'file.JPG'
         );
 
         $rule = new Extension();
@@ -99,14 +95,13 @@ class ExtensionTest extends TestCase
     public function testWithCustomMessage()
     {
         $this->expectException(RuleException::class);
-        $this->expectExceptionMessage(
-            'The png extension are not allowed'
-        );
+        $this->expectExceptionMessage('The png extension are not allowed');
+
         $file = new UploadedFile(
             $this->tmpFile,
             128,
             UPLOAD_ERR_OK,
-            clientFilename: $originalFilename = 'file.png'
+            clientFilename: 'file.png'
         );
 
         $rule = new Extension('The %s extension are not allowed');
