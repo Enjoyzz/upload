@@ -42,6 +42,7 @@ final class Extension implements RuleInterface
         return $this;
     }
 
+    #[\Override]
     public function check(UploadedFileInterface $file): void
     {
         $extension = strtolower(pathinfo(

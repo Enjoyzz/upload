@@ -35,6 +35,7 @@ final class Size implements RuleInterface
         return $this;
     }
 
+    #[\Override]
     public function check(UploadedFileInterface $file): void
     {
         $fileSize = $file->getSize() ?? 0;
@@ -69,6 +70,6 @@ final class Size implements RuleInterface
 
     private function convertBytesToMegaBytes(int $bytes): string
     {
-        return round($bytes / pow(1024, 2), 2) . ' MiB';
+        return ((string)round((float)$bytes / pow(1024, 2), 2)) . ' MiB';
     }
 }

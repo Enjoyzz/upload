@@ -14,7 +14,7 @@ and [League\Flysystem](https://github.com/thephpleague/flysystem) as a file stor
 
 ### Installing
 
-> This package requires PHP version 8.0 or later.
+> This package requires PHP version 8.2 or later.
 
 This package is available via Composer:
 

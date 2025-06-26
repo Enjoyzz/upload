@@ -5,14 +5,22 @@ declare(strict_types=1);
 namespace Enjoys\Tests\Upload;
 
 use Enjoys\Upload\Exception\RuleException;
+use Enjoys\Upload\FileInfo;
 use Enjoys\Upload\Rule\Extension;
 use Enjoys\Upload\RuleInterface;
 use Enjoys\Upload\UploadProcessing;
 use GuzzleHttp\Psr7\UploadedFile;
 use League\Flysystem\Filesystem;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
+use phpDocumentor\Reflection\File;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DependsOnClass;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(UploadProcessing::class)]
+#[CoversClass(FileInfo::class)]
 class UploadProcessingTest extends TestCase
 {
     protected function setUp(): void
@@ -49,9 +57,13 @@ class UploadProcessingTest extends TestCase
     }
 
 
+    /**
+     * @throws FilesystemException
+     * @throws Exception
+     */
     public function testUploadWithValidateSuccess()
     {
-        $rule = $this->getMockForAbstractClass(RuleInterface::class);
+        $rule = $this->createMock(RuleInterface::class);
         $rule->expects($this->once())->method('check');
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK);
         $file = new UploadProcessing($uploadedFile, $this->filesystem);
@@ -59,13 +71,17 @@ class UploadProcessingTest extends TestCase
         $file->upload();
     }
 
+    /**
+     * @throws FilesystemException
+     * @throws Exception
+     */
     public function testUploadWithValidateFailed()
     {
 
         $this->expectExceptionMessage($errorMessage = 'error');
         $this->expectException(RuleException::class);
 
-        $rule = $this->getMockForAbstractClass(RuleInterface::class);
+        $rule = $this->createMock(RuleInterface::class);
         $rule->expects($this->once())->method('check')->willThrowException(new RuleException($errorMessage));
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK);
         $file = new UploadProcessing($uploadedFile, $this->filesystem);
@@ -99,20 +115,26 @@ class UploadProcessingTest extends TestCase
         $this->assertSame('test', $file->getFileInfo()->getFilenameWithoutExtension());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAddRule()
     {
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
         $file = new UploadProcessing($uploadedFile, $this->filesystem);
-        $file->addRule($this->getMockForAbstractClass(RuleInterface::class));
+        $file->addRule($this->createMock(RuleInterface::class));
         $this->assertCount(1, $file->getRules());
     }
 
+    /**
+     * @throws Exception
+     */
     public function testAddRules()
     {
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
         $file = new UploadProcessing($uploadedFile, $this->filesystem);
-        $rules = array_fill(0, 3, $this->getMockForAbstractClass(RuleInterface::class));
-        $file->addRule($this->getMockForAbstractClass(RuleInterface::class));
+        $rules = array_fill(0, 3, $this->createMock(RuleInterface::class));
+        $file->addRule($this->createMock(RuleInterface::class));
         $file->addRules($rules);
         $this->assertCount(4, $file->getRules());
     }

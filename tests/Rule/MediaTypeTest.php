@@ -7,8 +7,11 @@ namespace Enjoys\Tests\Upload\Rule;
 use Enjoys\Upload\Exception\RuleException;
 use Enjoys\Upload\Rule\MediaType;
 use GuzzleHttp\Psr7\UploadedFile;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MediaType::class)]
 class MediaTypeTest extends TestCase
 {
 
@@ -189,7 +192,7 @@ class MediaTypeTest extends TestCase
         $rule->check($file);
     }
 
-    public function dataForAllowFailed()
+    public static function dataForAllowFailed(): array
     {
         return [
             ['image /png'],
@@ -203,9 +206,7 @@ class MediaTypeTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dataForAllowFailed
-     */
+    #[DataProvider('dataForAllowFailed')]
     public function testAllowFailed(string $mediaType)
     {
         $this->expectException(RuleException::class);

@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         operating-system: [ubuntu-latest, macOS-latest, windows-latest]
-        php-versions: ['8.0', '8.1', '8.2', '8.3']
+        php-versions: ['8.2', '8.3', '8.4']
     name: PHP ${{ matrix.php-versions }} Test on ${{ matrix.operating-system }}
     steps:
     - name: Checkout
@@ -20,7 +20,8 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php-versions }}
-        extensions: fileinfo
+        extensions: fileinfo, xdebug
+        coverage: xdebug
 
     - name: Check PHP Version
       run: php -v
@@ -43,4 +44,4 @@ jobs:
     - name: Run test suite
       run: |
         mkdir -p build/logs
-        vendor/bin/phpunit  tests --verbose --coverage-clover build/logs/clover.xml
+        vendor/bin/phpunit tests --coverage-clover build/logs/clover.xml

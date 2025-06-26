@@ -7,8 +7,11 @@ namespace Enjoys\Tests\Upload\Rule;
 use Enjoys\Upload\Exception\RuleException;
 use Enjoys\Upload\Rule\Size;
 use GuzzleHttp\Psr7\UploadedFile;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Size::class)]
 class SizeTest extends TestCase
 {
     protected function setUp(): void
@@ -60,9 +63,7 @@ class SizeTest extends TestCase
         $rule->check($file);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
+    #[DoesNotPerformAssertions]
     public function testCheckMaxSizeSuccess()
     {
         $file = new UploadedFile(
@@ -76,9 +77,7 @@ class SizeTest extends TestCase
         $rule->check($file);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
+    #[DoesNotPerformAssertions]
     public function testCheckMinSizeSuccess()
     {
         $file = new UploadedFile(
@@ -126,9 +125,7 @@ class SizeTest extends TestCase
         $rule->check($file);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
+    #[DoesNotPerformAssertions]
     public function testCheckMaxSizeIfEqualSizes()
     {
         $file = new UploadedFile(
@@ -142,9 +139,7 @@ class SizeTest extends TestCase
         $rule->check($file);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
+    #[DoesNotPerformAssertions]
     public function testCheckMinSizeIfEqualSizes()
     {
         $file = new UploadedFile(

@@ -7,8 +7,11 @@ namespace Enjoys\Tests\Upload\Rule;
 use Enjoys\Upload\Exception\RuleException;
 use Enjoys\Upload\Rule\Extension;
 use GuzzleHttp\Psr7\UploadedFile;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(Extension::class)]
 class ExtensionTest extends TestCase
 {
     protected function setUp(): void
@@ -42,9 +45,7 @@ class ExtensionTest extends TestCase
         $rule->check($file);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
+    #[DoesNotPerformAssertions]
     public function testCheckSuccess()
     {
         $file = new UploadedFile(
@@ -59,9 +60,7 @@ class ExtensionTest extends TestCase
         $rule->check($file);
     }
 
-    /**
-     * @doesNotPerformAssertions
-     */
+    #[DoesNotPerformAssertions]
     public function testCheckSuccessWithManyAllowed()
     {
         $file = new UploadedFile(

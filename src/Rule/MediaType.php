@@ -21,6 +21,7 @@ final class MediaType implements RuleInterface
         $this->errorMessage = $errorMessage ?? 'Media type is disallow: `%s`';
     }
 
+    #[\Override]
     public function check(UploadedFileInterface $file): void
     {
         $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media Type ins null');
