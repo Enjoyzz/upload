@@ -21,8 +21,8 @@
         "league/flysystem": "^3.30.0"
     },
     "require-dev": {
-        "vimeo/psalm": "^6",
-        "phpunit/phpunit": "^11",
+        "vimeo/psalm": "^6.12.0",
+        "phpunit/phpunit": "^11.5.24",
         "infection/infection": "^0.29.14",
         "league/flysystem-memory": "^3.29.0",
         "guzzlehttp/psr7": "^2.7.1"
@@ -39,7 +39,7 @@
     },
     "scripts": {
         "psalm": "./vendor/bin/psalm",
-        "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit",
+        "tests": "./vendor/bin/phpunit",
         "infection": [
             "Composer\\Config::disableProcessTimeout",
             "XDEBUG_MODE=coverage ./vendor/bin/infection -j2"

@@ -7,8 +7,10 @@ namespace Enjoys\Tests\Upload;
 use Enjoys\Upload\FileInfo;
 use GuzzleHttp\Psr7\Stream;
 use GuzzleHttp\Psr7\UploadedFile;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(FileInfo::class)]
 class FileInfoTest extends TestCase
 {
     protected function setUp(): void
