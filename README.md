@@ -12,17 +12,17 @@ File uploads library with validation
 uses [PSR-7 UploadedFileInterface](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-7-http-message.md#16-uploaded-files)
 and [League\Flysystem](https://github.com/thephpleague/flysystem) as a file storage library
 
-### Installing
+## Installation
 
-> This package requires PHP version 8.2 or later.
+> Requires PHP 8.2 or later.
 
-This package is available via Composer:
+Install via Composer:
 
 ```shell
-composer require enjoys/upload:^3.0
+composer require enjoys/upload:^4.0
 ```
 
-### Usage
+### Basic Usage
 
 ```php
 
@@ -32,199 +32,123 @@ use Psr\Http\Message\ServerRequestInterface;
 /** @var League\Flysystem\Filesystem $filesystem */
 
 $file = new Enjoys\Upload\UploadProcessing($uploadedFile, $filesystem);
+
 try {
     $file->upload();       
-}catch (\Exception $e){
-    // handle exception
+} catch (\Exception $e) {
+    // Handle exception
 }
 ```
 
-### Validation
+### Validation Rules
 
-Currently there are *3 validation rules*, but if a specific validation is needed, you can write a rule by implementing the Enjoys\Upload\RuleInterface interface:
+The library includes *3 built-in validation rules*. You can also create custom rules by implementing `Enjoys\Upload\RuleInterface`.
 
-- Extension (Enjoys\Upload\Rule\Extension)
-- Size (Enjoys\Upload\Rule\Size)
-- MediaType (Enjoys\Upload\Rule\MediaType)
+#### Available rules:
+- Extension (Enjoys\Upload\Rule\Extension) — Validates file extensions
+- Size (Enjoys\Upload\Rule\Size) — Validates file size
+- MediaType (Enjoys\Upload\Rule\MediaType) — Validates MIME types
+
+#### Adding Validation Rules
 
 ```php
 /** @var Enjoys\Upload\UploadProcessing $file */
 /** @var Enjoys\Upload\RuleInterface $rule */
 
-// ... set rule before called $file->upload()
-$file->addRule($rule);
-$file->upload(); 
+$file->addRule($rule); // Add before calling upload()
+$file->upload();
 ```
 
-#### Extension Rule
+##### Extension Rule
 
-Allowed extension case-insensitive
+Case-insensitive extension validation:
 
 ```php
 $rule = new Enjoys\Upload\Rule\Extension();
-$rule->allow('png');
-// or
-$rule->allow('png, jpg');
-// or
-$rule->allow(['png','jpg']);
+$rule->allow('png'); // Single extension
+$rule->allow('png, jpg'); // Comma-separated
+$rule->allow(['png', 'jpg']); // Array of extensions
 ```
 
-#### Size Rule
+##### Size Rule
 
 ```php
 $rule = new Enjoys\Upload\Rule\Size();
-$rule->setMaxSize(10*1024*1024)
-->setMinSize(1*1024*1024); // in bytes
+$rule->setMaxSize(10 * 1024 * 1024) // 10MB
+     ->setMinSize(1 * 1024 * 1024); // 1MB (values in bytes)
 ```
 
-#### MediaType Rule
+##### MediaType Rule
 
 ```php
 $rule = new Enjoys\Upload\Rule\MediaType();
-$rule->allow('image/*')
-     ->allow('application/pdf')
-     // ...
-    ;
+$rule->allow('image/*') // All image types
+     ->allow('application/pdf') // PDF files
+     ->allow('*/vnd.openxmlformats-officedocument.*'); // Office documents
 ```
 
-### Methods
+### API Reference
 
 #### Enjoys\Upload\UploadProcessing::class
 
 **setFilename(filename: string)**
 
-Set new filename for uploaded file. _Called before upload._
-
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->setFilename('name');
-```
+Sets a new filename for the uploaded file (call before upload).
 
 **addRule(rule: Enjoys\Upload\RuleInterface)**
 
-_Called before upload._
-
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-/** @var Enjoys\Upload\RuleInterface $rule */
-$file->addRule($rule);
-```
+Adds a single validation rule (call before upload).
 
 **addRules(rules: Enjoys\Upload\RuleInterface[])**
 
-_Called before upload._
-
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-/** @var Enjoys\Upload\RuleInterface[] $rules */
-$file->addRules($rules);
-```
+Adds multiple validation rules (call before upload).
 
 **upload(targetPath: string)**
 
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->upload(); // $file->upload('sub_directory');
-```
+Processes the file upload. Optionally specify a subdirectory.
 
-**getTargetPath()**
+**getTargetPath(): ?string**
 
-_Called after upload_. Something like a location in the file system is returned. If called before upload, returns `null`
-.
-
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getTargetPath(); // return null or string
-```
+Returns the file storage path after upload, or null if not uploaded.
 
 **getFilesystem()**
 
-Returns `League\Flysystem\Filesystem::class`
+Returns the `League\Flysystem\Filesystem::class` instance.
 
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getFilesystem(); 
-```
+**getUploadedFile(): UploadedFileInterface**
 
-**getUploadedFile()**
-
-Returns `Psr\Http\Message\UploadedFileInterface::class`
-
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getUploadedFile();
-```
+Returns the PSR-7 UploadedFileInterface instance.
 
 **getFileInfo()**
 
-Returns `Enjoys\Upload\FileInfo::class`
-
-```php
-/** @var Enjoys\Upload\UploadProcessing $file */
-$file->getFileInfo();
-```
+Returns the FileInfo object with file metadata.
 
 #### Enjoys\Upload\FileInfo::class
 
-**getFilename()**
+**getFilename(): string**
 
-Returns full filename, ex.  `new_file_name.jpg`
+Returns the full filename (e.g., new_file_name.jpg).
 
-```php
-/** @var Enjoys\Upload\FileInfo $fileInfo */
-$fileInfo->getFilename();
-```
+**getOriginalFilename(): string**
 
-**getOriginalFilename()**
+Returns the original uploaded filename.
 
-Returns original filename, ex.  `original_file_name.jpg`
+**getFilenameWithoutExtension(): string**
 
-```php
-/** @var Enjoys\Upload\FileInfo $fileInfo */
-$fileInfo->getOriginalFilename();
-```
+Returns the filename without extension.
 
-**getFilenameWithoutExtension()**
+**getExtension(): string**
 
-Returns filename without extension, ex.  `new_file_name`
+Returns the file extension (without dot).
 
-```php
-/** @var Enjoys\Upload\FileInfo $fileInfo */
-$fileInfo->getFilenameWithoutExtension();
-```
+**getExtensionWithDot(): string**
 
-**getExtension()**
+Returns the file extension with leading dot.
 
-Returns extension, ex.  `jpg`
+**getSize(): int**
 
-```php
-/** @var Enjoys\Upload\FileInfo $fileInfo */
-$fileInfo->getExtension();
-```
+Returns the file size in bytes.
 
-**getExtensionWithDot()**
+**getMediaType(): string**
 
-Returns extension with dot before, ex.  `.jpg`
-
-```php
-/** @var Enjoys\Upload\FileInfo $fileInfo */
-$fileInfo->getExtensionWithDot();
-```
-
-**getSize()**
-
-Returns filesize in bytes, ex.  `102435`
-
-```php
-/** @var Enjoys\Upload\FileInfo $fileInfo */
-$fileInfo->getSize();
-```
-
-**getMediaType()**
-
-Returns media type, determine by client extension, ex.  `image/jpg`
-
-```php
-/** @var Enjoys\Upload\FileInfo $fileInfo */
-$fileInfo->getMediaType();
-```
+Returns the client-reported MIME type.
