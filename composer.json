@@ -26,6 +26,7 @@
         "phpunit/phpunit": "^11.5.25",
         "infection/infection": "^0.29.14",
         "league/flysystem-memory": "^3.29.0",
+        "symfony/var-dumper": "^6.0 | ^7.0",
         "guzzlehttp/psr7": "^2.7.1"
     },
     "autoload": {
