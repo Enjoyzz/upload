@@ -27,6 +27,7 @@ abstract class AbstractUploadEvent implements StoppableEventInterface
      *
      * @return bool True if event propagation is stopped, false otherwise
      */
+    #[\Override]
     public function isPropagationStopped(): bool
     {
         return $this->propagationStopped;
