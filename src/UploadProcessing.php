@@ -13,12 +13,13 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\UploadedFileInterface;
+use Throwable;
 
 final class UploadProcessing
 {
 
     /**
-     * @var string|null Final storage path (null until file is uploaded)
+     * @var string|null Final storage path (null until a file is uploaded)
      */
     private ?string $targetPath = null;
 
@@ -36,6 +37,7 @@ final class UploadProcessing
      * @param UploadedFileInterface $uploadedFile The PSR-7 uploaded file to process
      * @param Filesystem $filesystem Flysystem instance that provides filesystem abstraction
      * (supports local, FTP, S3, and other storage systems)
+     * @param EventDispatcherInterface|null $dispatcher Optional event dispatcher for handling upload-related events
      */
     public function __construct(
         private readonly UploadedFileInterface $uploadedFile,
@@ -51,7 +53,7 @@ final class UploadProcessing
      * @param string $targetPath The target directory path (defaults to '/')
      * @throws FilesystemException If there's an error during file system operations
      * @throws RuleException Thrown when validation fails
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function upload(string $targetPath = '/'): void
     {
@@ -62,7 +64,7 @@ final class UploadProcessing
             $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
             $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
             $this->dispatcher?->dispatch(new AfterUploadEvent($this));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->dispatcher?->dispatch(new UploadErrorEvent($this, $e));
             throw $e;
         }
