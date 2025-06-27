@@ -4,8 +4,14 @@ declare(strict_types=1);
 
 namespace Enjoys\Upload;
 
+use Enjoys\Upload\Event\AfterUploadEvent;
+use Enjoys\Upload\Event\BeforeUploadEvent;
+use Enjoys\Upload\Event\BeforeValidationEvent;
+use Enjoys\Upload\Event\UploadErrorEvent;
+use Enjoys\Upload\Exception\RuleException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\Http\Message\UploadedFileInterface;
 
 final class UploadProcessing
@@ -34,6 +40,7 @@ final class UploadProcessing
     public function __construct(
         private readonly UploadedFileInterface $uploadedFile,
         private readonly Filesystem $filesystem,
+        private readonly ?EventDispatcherInterface $dispatcher = null
     ) {
         $this->fileInfo = new FileInfo($uploadedFile);
     }
@@ -43,17 +50,28 @@ final class UploadProcessing
      *
      * @param string $targetPath The target directory path (defaults to '/')
      * @throws FilesystemException If there's an error during file system operations
+     * @throws RuleException Thrown when validation fails
+     * @throws \Throwable
      */
     public function upload(string $targetPath = '/'): void
     {
-        $this->validate();
-
-        $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
-        $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
+        try {
+            $this->dispatcher?->dispatch(new BeforeValidationEvent($this));
+            $this->validate();
+            $this->dispatcher?->dispatch(new BeforeUploadEvent($this));
+            $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
+            $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
+            $this->dispatcher?->dispatch(new AfterUploadEvent($this));
+        } catch (\Throwable $e) {
+            $this->dispatcher?->dispatch(new UploadErrorEvent($this, $e));
+            throw $e;
+        }
     }
 
     /**
      * Validates the uploaded file against all registered rules
+     *
+     * @throws RuleException Thrown when validation fails
      */
     private function validate(): void
     {
