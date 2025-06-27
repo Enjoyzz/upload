@@ -9,7 +9,7 @@ use Enjoys\Upload\UploadProcessing;
 
 final class BeforeUploadEvent extends AbstractUploadEvent
 {
-    public function __construct(public readonly UploadProcessing $file)
+    public function __construct(public readonly UploadProcessing $uploadProcessing)
     {
     }
 }

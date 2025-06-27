@@ -10,7 +10,7 @@ use Psr\Http\Message\UploadedFileInterface;
 
 final class BeforeValidationEvent extends AbstractUploadEvent
 {
-    public function __construct(public readonly UploadProcessing $file)
+    public function __construct(public readonly UploadProcessing $uploadProcessing)
     {
     }
 }
