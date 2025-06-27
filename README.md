@@ -113,7 +113,7 @@ Returns the file storage path after upload, or null if not uploaded.
 
 **getFilesystem()**
 
-Returns the `Flysystem` Filesystem instance.
+Returns the `League\Flysystem\Filesystem::class` instance.
 
 **getUploadedFile(): UploadedFileInterface**
 

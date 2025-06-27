@@ -32,7 +32,7 @@ final class MediaType implements RuleInterface
      * @var array Allowed media types in format:
      *   [
      *     'type' => ['subtype1', 'subtype2'], // Specific subtypes
-     *     'type' => '*',                      // All subtypes for type
+     *     'type' => '*', // All subtypes for type
      *   ]
      *   or empty array if none allowed
      */
@@ -51,11 +51,11 @@ final class MediaType implements RuleInterface
     /**
      * @param string|null $errorMessage Custom error message when validation fails.
      *        The %s placeholder will be replaced with the rejected media type.
-     *        Default: "Media type is disallow: `%s`"
+     *        Default: "Media type is disallowed: `%s`"
      */
     public function __construct(string $errorMessage = null)
     {
-        $this->errorMessage = $errorMessage ?? 'Media type is disallow: `%s`';
+        $this->errorMessage = $errorMessage ?? 'Media type is disallowed: `%s`';
     }
 
     /**
@@ -109,8 +109,8 @@ final class MediaType implements RuleInterface
      * @throws RuleException When:
      *         - Pattern doesn't contain '/'
      *         - Has leading/trailing spaces around '/'
-     *         - Missing type or subtype part
-     *         - Uses standalone "*" (use "image/*" or "*\/*" instead)
+     *         - Missing type, or subtype part
+     *         - Uses standalone "*" (use "image/*")
      *
      * @see MediaTypeTest::dataForAllowFailed() For all invalid cases
      */
