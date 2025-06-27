@@ -50,8 +50,7 @@ final class UploadProcessing
 
         $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
 
-        $stream = $this->uploadedFile->getStream();
-        $resource = $stream->detach();
+        $resource = $this->uploadedFile->getStream()->detach();
         try {
             $this->filesystem->writeStream($this->targetPath, $resource);
         } finally {
