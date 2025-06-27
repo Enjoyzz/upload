@@ -49,7 +49,16 @@ final class UploadProcessing
         $this->validate();
 
         $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
-        $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
+
+        $stream = $this->uploadedFile->getStream();
+        $resource = $stream->detach();
+        try {
+            $this->filesystem->writeStream($this->targetPath, $resource);
+        } finally {
+            if (is_resource($resource)) {
+                fclose($resource);
+            }
+        }
     }
 
     /**
