@@ -86,6 +86,49 @@ $rule->allow('image/*') // All image types
      ->allow('application/pdf') // PDF files
      ->allow('*/vnd.openxmlformats-officedocument.*'); // Office documents
 ```
+### Event System
+
+The library provides PSR-14 compatible events:
+
+#### Available Events:
+- **`BeforeValidationEvent`** - Dispatched before validation starts
+- **`BeforeUploadEvent`** - Dispatched after validation, before file upload
+- **`AfterUploadEvent`** - Dispatched after successful file upload
+- **`UploadErrorEvent`** - Dispatched when any error occurs
+
+#### Usage Example:
+```php
+use Enjoys\Upload\Event\AfterUploadEvent;
+use Psr\EventDispatcher\EventDispatcherInterface;
+
+/** @var EventDispatcherInterface $dispatcher */
+
+// Initialize with event dispatcher
+$upload = new UploadProcessing($uploadedFile, $filesystem, $dispatcher);
+
+// Add event listener
+$dispatcher->addListener(
+    AfterUploadEvent::class,
+    function (AfterUploadEvent $event) {
+        logger()->info("File uploaded to: " . $event->uploadProcessing->getTargetPath());
+    }
+);
+
+$upload->upload();
+```
+
+#### Event Propagation:
+All events implement `StoppableEventInterface`. To stop further processing:
+```php
+$dispatcher->addListener(
+    BeforeUploadEvent::class,
+    function (BeforeUploadEvent $event) {
+        if ($shouldStop) {
+            $event->stopPropagation(); // Stops other listeners
+        }
+    }
+);
+```
 
 ### API Reference
 
