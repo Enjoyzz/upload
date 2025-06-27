@@ -3,10 +3,12 @@ declare(strict_types=1);
 
 namespace Enjoys\Tests\Upload;
 
+use Enjoys\Upload\Event\AbstractUploadEvent;
 use Enjoys\Upload\Event\AfterUploadEvent;
 use Enjoys\Upload\Event\BeforeUploadEvent;
 use Enjoys\Upload\Event\BeforeValidationEvent;
 use Enjoys\Upload\Event\UploadErrorEvent;
+use Enjoys\Upload\FileInfo;
 use Enjoys\Upload\UploadProcessing;
 use GuzzleHttp\Psr7\UploadedFile;
 use League\Flysystem\Filesystem;
@@ -20,6 +22,11 @@ use RuntimeException;
 use Throwable;
 
 #[CoversClass(UploadProcessing::class)]
+#[CoversClass(FileInfo::class)]
+#[CoversClass(BeforeValidationEvent::class)]
+#[CoversClass(BeforeUploadEvent::class)]
+#[CoversClass(AfterUploadEvent::class)]
+#[CoversClass(UploadErrorEvent::class)]
 final class UploadProcessingEventTest extends TestCase
 {
     private string $tmpFile;
@@ -163,5 +170,44 @@ final class UploadProcessingEventTest extends TestCase
             $clientFilename ?? 'original_file_name.txt',
             $mediaType ?? 'plain/text'
         );
+    }
+
+    public function testEventPropagation(): void
+    {
+        $event = new class extends AbstractUploadEvent {};
+        $this->assertFalse($event->isPropagationStopped());
+        $event->stopPropagation();
+        $this->assertTrue($event->isPropagationStopped());
+    }
+
+    public function testEventPropagationStopping(): void
+    {
+
+        $dispatcher = new class implements EventDispatcherInterface {
+            public array $dispatchedEvents = [];
+
+            public function dispatch(object $event): object
+            {
+                if ($event->isPropagationStopped()) {
+                    return $event;
+                }
+
+                $this->dispatchedEvents[] = $event;
+                return $event;
+            }
+        };
+
+        $uploadProcessing = new UploadProcessing($this->createUploadedFile(), $this->filesystem, $dispatcher);
+
+        $event1 = new AfterUploadEvent($uploadProcessing);
+        $event2 = new AfterUploadEvent($uploadProcessing);
+
+        $event1->stopPropagation();
+
+        $dispatcher->dispatch($event1);
+        $dispatcher->dispatch($event2);
+
+        $this->assertCount(1, $dispatcher->dispatchedEvents);
+        $this->assertSame($event2, $dispatcher->dispatchedEvents[0]);
     }
 }

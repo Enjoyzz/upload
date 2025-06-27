@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace Enjoys\Upload\Event;
-
 
 use Enjoys\Upload\UploadProcessing;
 
