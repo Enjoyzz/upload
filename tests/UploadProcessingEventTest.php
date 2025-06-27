@@ -1,5 +1,4 @@
 <?php
-
 declare(strict_types=1);
 
 namespace Enjoys\Tests\Upload;
@@ -21,7 +20,7 @@ use RuntimeException;
 use Throwable;
 
 #[CoversClass(UploadProcessing::class)]
-class UploadProcessingEventTest extends TestCase
+final class UploadProcessingEventTest extends TestCase
 {
     private string $tmpFile;
     private Filesystem $filesystem;
@@ -33,7 +32,7 @@ class UploadProcessingEventTest extends TestCase
         $this->filesystem = new Filesystem(new InMemoryFilesystemAdapter());
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         if (file_exists($this->tmpFile)) {
             unlink($this->tmpFile);
@@ -47,60 +46,63 @@ class UploadProcessingEventTest extends TestCase
      */
     public function testEventsAreDispatchedInCorrectOrder(): void
     {
-        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
+        $uploadedFile = $this->createUploadedFile();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
 
         $dispatchedEvents = [];
         $dispatcher->method('dispatch')
             ->willReturnCallback(function ($event) use (&$dispatchedEvents) {
-                $dispatchedEvents[] = get_class($event);
+                $dispatchedEvents[] = $event;
                 return $event;
             });
 
         $upload = new UploadProcessing($uploadedFile, $this->filesystem, $dispatcher);
         $upload->upload();
 
-        $this->assertSame([
-            BeforeValidationEvent::class,
-            BeforeUploadEvent::class,
-            AfterUploadEvent::class
-        ], $dispatchedEvents);
+        $this->assertCount(3, $dispatchedEvents);
+        $this->assertInstanceOf(BeforeValidationEvent::class, $dispatchedEvents[0]);
+        $this->assertInstanceOf(BeforeUploadEvent::class, $dispatchedEvents[1]);
+        $this->assertInstanceOf(AfterUploadEvent::class, $dispatchedEvents[2]);
     }
 
     /**
-     * @throws FilesystemException
-     * @throws Throwable
      * @throws Exception
+     * @throws Throwable
      */
     public function testErrorEventIsDispatchedOnException(): void
     {
         $this->expectException(RuntimeException::class);
-        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
+        $uploadedFile = $this->createUploadedFile();
         $dispatcher = $this->createMock(EventDispatcherInterface::class);
+
         $filesystem = $this->createMock(Filesystem::class);
-        $filesystem->method('writeStream')->willThrowException(
-            new RuntimeException('Test error')
-        );
+        $filesystem->method('writeStream')
+            ->willThrowException(new RuntimeException('Test error'));
 
         $dispatchedEvents = [];
         $dispatcher->method('dispatch')
             ->willReturnCallback(function ($event) use (&$dispatchedEvents) {
-                $dispatchedEvents[] = get_class($event);
+                $dispatchedEvents[] = $event;
                 return $event;
             });
 
         $upload = new UploadProcessing($uploadedFile, $filesystem, $dispatcher);
+
         try {
             $upload->upload();
             $this->fail('Expected exception was not thrown');
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             $this->assertSame('Test error', $e->getMessage());
+
             $this->assertCount(3, $dispatchedEvents);
-            $this->assertSame([
-                BeforeValidationEvent::class,
-                BeforeUploadEvent::class,
-                UploadErrorEvent::class
-            ], $dispatchedEvents);
+            $this->assertInstanceOf(BeforeValidationEvent::class, $dispatchedEvents[0]);
+            $this->assertInstanceOf(BeforeUploadEvent::class, $dispatchedEvents[1]);
+            $this->assertInstanceOf(UploadErrorEvent::class, $dispatchedEvents[2]);
+
+            /** @var UploadErrorEvent $errorEvent */
+            $errorEvent = $dispatchedEvents[2];
+            $this->assertSame($upload, $errorEvent->uploadProcessing);
+            $this->assertSame($e, $errorEvent->exception);
             throw $e;
         }
     }
@@ -111,10 +113,12 @@ class UploadProcessingEventTest extends TestCase
      */
     public function testWorksWithoutDispatcher(): void
     {
-        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
+        $uploadedFile = $this->createUploadedFile();
         $upload = new UploadProcessing($uploadedFile, $this->filesystem);
         $upload->upload();
+
         $this->assertNotNull($upload->getTargetPath());
+        $this->assertTrue($this->filesystem->fileExists($upload->getTargetPath()));
     }
 
     /**
@@ -123,9 +127,8 @@ class UploadProcessingEventTest extends TestCase
      */
     public function testEventContainsCorrectContext(): void
     {
-        $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
+        $uploadedFile = $this->createUploadedFile();
         $dispatcher = new class implements EventDispatcherInterface {
-
             public array $dispatchedEvents = [];
 
             public function dispatch(object $event): object
@@ -141,16 +144,24 @@ class UploadProcessingEventTest extends TestCase
 
         $this->assertCount(3, $dispatcher->dispatchedEvents);
 
-        /** @var BeforeValidationEvent $beforeValidationEvent */
         $beforeValidationEvent = $dispatcher->dispatchedEvents[0];
         $this->assertSame($upload, $beforeValidationEvent->uploadProcessing);
 
-        /** @var BeforeUploadEvent $beforeUploadEvent */
         $beforeUploadEvent = $dispatcher->dispatchedEvents[1];
         $this->assertSame($upload, $beforeUploadEvent->uploadProcessing);
 
-        /** @var AfterUploadEvent $afterUploadEvent */
         $afterUploadEvent = $dispatcher->dispatchedEvents[2];
         $this->assertSame('/test/path/test.txt', $afterUploadEvent->uploadProcessing->getTargetPath());
+    }
+
+    private function createUploadedFile(?string $clientFilename = null, ?string $mediaType = null): UploadedFile
+    {
+        return new UploadedFile(
+            $this->tmpFile,
+            128,
+            UPLOAD_ERR_OK,
+            $clientFilename ?? 'original_file_name.txt',
+            $mediaType ?? 'plain/text'
+        );
     }
 }
