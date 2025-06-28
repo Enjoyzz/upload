@@ -56,26 +56,24 @@ final class UploadProcessing
      * @throws Throwable
      */
     public function upload(string $targetPath = '/'): void
- 
+    {
+        $this->dispatcher?->dispatch(new BeforeValidationEvent($this));
+        $this->validate();
+
+        $this->dispatcher?->dispatch(new BeforeUploadEvent($this));
+        $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
+
+        $resource = $this->uploadedFile->getStream()->detach();
         try {
-            $this->dispatcher?->dispatch(new BeforeValidationEvent($this));
-            $this->validate();
-          
-            $this->dispatcher?->dispatch(new BeforeUploadEvent($this));         
-            $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
-          
-            $resource = $this->uploadedFile->getStream()->detach();
-            try {
-                $this->filesystem->writeStream($this->targetPath, $resource);
-                $this->dispatcher?->dispatch(new AfterUploadEvent($this));
-            } finally {
-                if (is_resource($resource)) {
-                    fclose($resource);
-                }
-            } catch (Throwable $e) {
-                $this->dispatcher?->dispatch(new UploadErrorEvent($this, $e));
-                throw $e;
-            }      
+            $this->filesystem->writeStream($this->targetPath, $resource);
+            $this->dispatcher?->dispatch(new AfterUploadEvent($this));
+        } catch (Throwable $e) {
+            $this->dispatcher?->dispatch(new UploadErrorEvent($this, $e));
+            throw $e;
+        } finally {
+            if (is_resource($resource)) {
+                fclose($resource);
+            }
         }
     }
 
@@ -84,7 +82,8 @@ final class UploadProcessing
      *
      * @throws RuleException Thrown when validation fails
      */
-    private function validate(): void
+    private
+    function validate(): void
     {
         foreach ($this->rules as $rule) {
             $rule->check($this->getUploadedFile());
@@ -97,8 +96,10 @@ final class UploadProcessing
      *
      * @param string $filename The desired filename
      */
-    public function setFilename(string $filename): void
-    {
+    public
+    function setFilename(
+        string $filename
+    ): void {
         $this->fileInfo->setFilename($filename);
     }
 
@@ -107,7 +108,8 @@ final class UploadProcessing
      *
      * @return UploadedFileInterface UploadedFileInterface The PSR-7 compliant uploaded file object
      */
-    public function getUploadedFile(): UploadedFileInterface
+    public
+    function getUploadedFile(): UploadedFileInterface
     {
         return $this->uploadedFile;
     }
@@ -117,7 +119,8 @@ final class UploadProcessing
      *
      * @return string|null The target path or null if not uploaded yet
      */
-    public function getTargetPath(): ?string
+    public
+    function getTargetPath(): ?string
     {
         return $this->targetPath;
     }
@@ -127,7 +130,8 @@ final class UploadProcessing
      *
      * @return Filesystem The filesystem instance
      */
-    public function getFilesystem(): Filesystem
+    public
+    function getFilesystem(): Filesystem
     {
         return $this->filesystem;
     }
@@ -137,7 +141,8 @@ final class UploadProcessing
      *
      * @return FileInfo The file information instance
      */
-    public function getFileInfo(): FileInfo
+    public
+    function getFileInfo(): FileInfo
     {
         return $this->fileInfo;
     }
@@ -147,8 +152,10 @@ final class UploadProcessing
      *
      * @param RuleInterface $rule The rule to add
      */
-    public function addRule(RuleInterface $rule): void
-    {
+    public
+    function addRule(
+        RuleInterface $rule
+    ): void {
         $this->rules[] = $rule;
     }
 
@@ -157,8 +164,10 @@ final class UploadProcessing
      *
      * @param RuleInterface[] $rules Array of rules to add
      */
-    public function addRules(array $rules): void
-    {
+    public
+    function addRules(
+        array $rules
+    ): void {
         $this->rules = array_merge($this->rules, $rules);
     }
 
@@ -167,10 +176,9 @@ final class UploadProcessing
      *
      * @return RuleInterface[] Array of validation rules
      */
-    public function getRules(): array
+    public
+    function getRules(): array
     {
         return $this->rules;
     }
-
-
 }
