@@ -10,7 +10,6 @@ use Psr\Http\Message\UploadedFileInterface;
 
 final class UploadProcessing
 {
-
     /**
      * @var string|null Final storage path (null until file is uploaded)
      */

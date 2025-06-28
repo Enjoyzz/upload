@@ -27,7 +27,6 @@ use Psr\Http\Message\UploadedFileInterface;
  */
 final class MediaType implements RuleInterface
 {
-
     /**
      * @var array Allowed media types in format:
      *   [

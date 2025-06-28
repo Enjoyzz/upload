@@ -14,8 +14,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(MediaType::class)]
 class MediaTypeTest extends TestCase
 {
-
-
     protected function setUp(): void
     {
         $this->tmpFile = tempnam(sys_get_temp_dir(), 'testUpload');
