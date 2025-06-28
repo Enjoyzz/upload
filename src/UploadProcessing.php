@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-
 namespace Enjoys\Upload;
 
 use Enjoys\Upload\Event\AfterUploadEvent;
