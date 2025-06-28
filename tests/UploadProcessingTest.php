@@ -15,6 +15,8 @@ use League\Flysystem\InMemory\InMemoryFilesystemAdapter;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\UploadedFileInterface;
 
 #[CoversClass(UploadProcessing::class)]
 #[CoversClass(FileInfo::class)]
@@ -130,7 +132,7 @@ class UploadProcessingTest extends TestCase
     /**
      * @throws Exception
      */
-    public function testAddRules()
+    public function testAddRules(): void
     {
         $uploadedFile = new UploadedFile($this->tmpFile, 128, UPLOAD_ERR_OK, 'original_file_name.txt', 'plain/text');
         $file = new UploadProcessing($uploadedFile, $this->filesystem);
@@ -138,5 +140,89 @@ class UploadProcessingTest extends TestCase
         $file->addRule($this->createMock(RuleInterface::class));
         $file->addRules($rules);
         $this->assertCount(4, $file->getRules());
+    }
+
+    /**
+     * @throws FilesystemException
+     * @throws Exception
+     */
+    public function testWriteStreamClosesResource(): void
+    {
+        $stream = $this->createMock(StreamInterface::class);
+        $resource = fopen('php://memory', 'r+');
+
+        $stream->method('detach')
+            ->willReturn($resource);
+
+        $uploadedFile = $this->createMock(UploadedFileInterface::class);
+        $uploadedFile->method('getStream')
+            ->willReturn($stream);
+
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->once())
+            ->method('writeStream')
+            ->with('/target/path/', $resource);
+
+        $upload = new UploadProcessing($uploadedFile, $filesystem);
+        $upload->upload('/target/path');
+
+        $this->assertFalse(is_resource($resource), 'Resource should be closed');
+    }
+
+    /**
+     * @throws FilesystemException
+     * @throws Exception
+     */
+    public function testClosesResourceOnWriteFailure(): void
+    {
+        $stream = $this->createMock(StreamInterface::class);
+        $resource = fopen('php://memory', 'r+');
+
+        $stream->method('detach')
+            ->willReturn($resource);
+
+        $uploadedFile = $this->createMock(UploadedFileInterface::class);
+        $uploadedFile->method('getStream')
+            ->willReturn($stream);
+
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->method('writeStream')
+            ->willThrowException(new \RuntimeException('Write error'));
+
+        $upload = new UploadProcessing($uploadedFile, $filesystem);
+
+
+        try {
+            $upload->upload();
+            $this->fail('Expected exception was not thrown');
+        } catch (\RuntimeException $e) {
+            $this->assertFalse(is_resource($resource), 'Resource should be closed even on failure');
+        }
+    }
+
+    /**
+     * @throws FilesystemException
+     * @throws Exception
+     */
+    public function testHandlesAlreadyClosedResource(): void
+    {
+        $stream = $this->createMock(StreamInterface::class);
+        $resource = fopen('php://memory', 'r+');
+        fclose($resource);
+
+        $stream->method('detach')
+            ->willReturn($resource);
+
+        $uploadedFile = $this->createMock(UploadedFileInterface::class);
+        $uploadedFile->method('getStream')
+            ->willReturn($stream);
+
+        $filesystem = $this->createMock(Filesystem::class);
+        $filesystem->expects($this->once())
+            ->method('writeStream')
+            ->with('/target/path/', $resource);
+
+        $upload = new UploadProcessing($uploadedFile, $filesystem);
+        $upload->upload('/target/path');
     }
 }

@@ -56,17 +56,26 @@ final class UploadProcessing
      * @throws Throwable
      */
     public function upload(string $targetPath = '/'): void
-    {
+ 
         try {
             $this->dispatcher?->dispatch(new BeforeValidationEvent($this));
             $this->validate();
-            $this->dispatcher?->dispatch(new BeforeUploadEvent($this));
+          
+            $this->dispatcher?->dispatch(new BeforeUploadEvent($this));         
             $this->targetPath = rtrim($targetPath, '/') . '/' . $this->fileInfo->getFilename();
-            $this->filesystem->writeStream($this->targetPath, $this->uploadedFile->getStream()->detach());
-            $this->dispatcher?->dispatch(new AfterUploadEvent($this));
-        } catch (Throwable $e) {
-            $this->dispatcher?->dispatch(new UploadErrorEvent($this, $e));
-            throw $e;
+          
+            $resource = $this->uploadedFile->getStream()->detach();
+            try {
+                $this->filesystem->writeStream($this->targetPath, $resource);
+                $this->dispatcher?->dispatch(new AfterUploadEvent($this));
+            } finally {
+                if (is_resource($resource)) {
+                    fclose($resource);
+                }
+            } catch (Throwable $e) {
+                $this->dispatcher?->dispatch(new UploadErrorEvent($this, $e));
+                throw $e;
+            }      
         }
     }
 
