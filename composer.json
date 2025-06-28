@@ -25,7 +25,8 @@
         "phpunit/phpunit": "^11.5.24",
         "infection/infection": "^0.29.14",
         "league/flysystem-memory": "^3.29.0",
-        "guzzlehttp/psr7": "^2.7.1"
+        "guzzlehttp/psr7": "^2.7.1",
+        "friendsofphp/php-cs-fixer": "~v3.75.0"
     },
     "autoload": {
         "psr-4": {
@@ -38,6 +39,7 @@
         }
     },
     "scripts": {
+        "ci": "./vendor/bin/php-cs-fixer fix src",
         "psalm": "./vendor/bin/psalm",
         "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --testdox --coverage-clover ./build/clover.xml",
         "infection": [
