@@ -19,12 +19,12 @@ jobs:
       - name: Run PHP-CS-Fixer (dry run)
         uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
         with:
-          args: check --diff --verbose
+          args: check . --diff --verbose
 
       - name: Apply PHP-CS-Fixer fixes
         uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
         with:
-          args: fix
+          args: fix .
 
       - name: Commit and push changes
         if: github.event_name == 'pull_request'
