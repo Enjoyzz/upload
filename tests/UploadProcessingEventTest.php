@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Enjoys\Tests\Upload;
@@ -135,7 +136,7 @@ final class UploadProcessingEventTest extends TestCase
     public function testEventContainsCorrectContext(): void
     {
         $uploadedFile = $this->createUploadedFile();
-        $dispatcher = new class implements EventDispatcherInterface {
+        $dispatcher = new class () implements EventDispatcherInterface {
             public array $dispatchedEvents = [];
 
             public function dispatch(object $event): object
@@ -174,7 +175,7 @@ final class UploadProcessingEventTest extends TestCase
 
     public function testEventPropagation(): void
     {
-        $event = new class extends AbstractUploadEvent {};
+        $event = new class () extends AbstractUploadEvent {};
         $this->assertFalse($event->isPropagationStopped());
         $event->stopPropagation();
         $this->assertTrue($event->isPropagationStopped());
@@ -183,7 +184,7 @@ final class UploadProcessingEventTest extends TestCase
     public function testEventPropagationStopping(): void
     {
 
-        $dispatcher = new class implements EventDispatcherInterface {
+        $dispatcher = new class () implements EventDispatcherInterface {
             public array $dispatchedEvents = [];
 
             public function dispatch(object $event): object
