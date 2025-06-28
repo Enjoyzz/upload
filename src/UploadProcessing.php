@@ -88,6 +88,7 @@ final class UploadProcessing
         }
     }
 
+
     /**
      * Sets the filename for the uploaded file
      * Automatically adds an extension if it is not specified
