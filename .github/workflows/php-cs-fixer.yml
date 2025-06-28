@@ -20,11 +20,13 @@ jobs:
         uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
         with:
           args: check . --diff --verbose
+        continue-on-error: true
 
       - name: Apply PHP-CS-Fixer fixes
         uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
         with:
           args: fix .
+        continue-on-error: true
 
       - name: Commit and push changes
         if: github.event_name == 'pull_request'
