@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+
 namespace Enjoys\Upload;
 
 use Enjoys\Upload\Event\AfterUploadEvent;
@@ -87,7 +88,6 @@ final class UploadProcessing
             $rule->check($this->getUploadedFile());
         }
     }
-
 
     /**
      * Sets the filename for the uploaded file
