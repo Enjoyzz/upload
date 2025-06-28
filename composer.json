@@ -39,7 +39,7 @@
         }
     },
     "scripts": {
-        "ci": "./vendor/bin/php-cs-fixer fix src",
+        "ci": "./vendor/bin/php-cs-fixer fix .",
         "psalm": "./vendor/bin/psalm",
         "tests": "XDEBUG_MODE=coverage ./vendor/bin/phpunit --testdox --coverage-clover ./build/clover.xml",
         "infection": [
