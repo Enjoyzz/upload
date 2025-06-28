@@ -1,0 +1,56 @@
+name: PHP-CS-Fixer
+
+on:
+  pull_request:
+
+jobs:
+  php-cs-fixer:
+    name: PHP-CS-Fixer
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.head_ref }}
+
+      - name: Debug branch info
+        run: |
+          echo "HEAD_REF: ${{ github.head_ref }}"
+          echo "BASE_REF: ${{ github.base_ref }}"
+          git branch -a
+          git status
+
+      - name: Run PHP-CS-Fixer (dry run)
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
+        with:
+          args: fix . --dry-run --diff --verbose
+        continue-on-error: true
+
+      - name: Apply PHP-CS-Fixer fixes
+        id: php-cs-fix
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
+        with:
+          args: fix . --verbose
+
+      - name: Show changes made
+        run: |
+          git status
+          git diff --stat
+
+      - name: Commit and push changes
+        if: steps.php-cs-fix.outcome == 'success' && github.event_name == 'pull_request'
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add .
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Apply PHP-CS-Fixer fixes [skip ci]" || echo "Commit failed (possibly no changes)"
+            git push origin HEAD:${{ github.head_ref }} || echo "Push failed"
+          else
+            echo "No changes to commit after PHP-CS-Fixer"
+          fi

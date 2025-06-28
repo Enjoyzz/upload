@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-
 namespace Enjoys\Upload\Rule;
-
 
 use Enjoys\Upload\Exception\RuleException;
 use Enjoys\Upload\RuleInterface;

@@ -17,7 +17,6 @@ use Throwable;
 
 final class UploadProcessing
 {
-
     /**
      * @var string|null Final storage path (null until a file is uploaded)
      */
