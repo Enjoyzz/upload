@@ -27,7 +27,6 @@ use Psr\Http\Message\UploadedFileInterface;
  */
 final class MediaType implements RuleInterface
 {
-
     /**
      * @var string[] Array of compiled regex patterns
      * @psalm-var non-empty-string[]
