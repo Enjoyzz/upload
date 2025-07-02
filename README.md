@@ -85,6 +85,7 @@ $rule = new Enjoys\Upload\Rule\MediaType();
 $rule->allow('image/*') // All image types
      ->allow('application/pdf') // PDF files
      ->allow('*/vnd.openxmlformats-officedocument.*'); // Office documents
+$rule->allow('*'); // All types
 ```
 ### Event System
 
