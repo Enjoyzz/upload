@@ -18,34 +18,26 @@ use Psr\Http\Message\UploadedFileInterface;
  * 3. Subtype wildcards: "*\/subtype" (e.g. "*\/png" allows png in any type)
  *
  * Note:
- * - The special pattern "*" is NOT supported (will throw RuleException)
+ * - The special pattern "*" is supported and automatically converted to "*\/*"
  * - Patterns must strictly follow "type/subtype" format:
  *   - No spaces around slash
  *   - No missing parts
- *   - No standalone wildcards
+ *   - Exactly one slash separating type and subtype
  * - Validation is case-sensitive
  */
 final class MediaType implements RuleInterface
 {
+
     /**
-     * @var array Allowed media types in format:
-     *   [
-     *     'type' => ['subtype1', 'subtype2'], // Specific subtypes
-     *     'type' => '*', // All subtypes for type
-     *   ]
-     *   or empty array if none allowed
+     * @var string[] Array of compiled regex patterns
+     * @psalm-var non-empty-string[]
      */
-    private array $allowedMediaType = [];
+    private array $allowPatterns = [];
 
     /**
      * @var string Error message template (uses %s placeholder for invalid type)
      */
     private string $errorMessage;
-
-    /**
-     * @var bool Flag to allow all media types (when '*' is set as type)
-     */
-    private bool $allowedAllMediaType = false;
 
     /**
      * @param string|null $errorMessage Custom error message when validation fails.
@@ -66,29 +58,15 @@ final class MediaType implements RuleInterface
     #[\Override]
     public function check(UploadedFileInterface $file): void
     {
-        $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media Type ins null');
+        $mediaType = $file->getClientMediaType() ?? throw new RuleException('Media type is null');
 
-        if ($this->allowedAllMediaType) {
-            return;
+        foreach ($this->allowPatterns as $pattern) {
+            if (preg_match($pattern, $mediaType)) {
+                return;
+            }
         }
 
-        list($type, $subType) = $this->explode($mediaType);
-
-        if (!array_key_exists($type, $this->allowedMediaType)) {
-            throw new RuleException(sprintf($this->errorMessage, sprintf('%s/*', $type)));
-        }
-
-        /** @var string|string[] $allowed */
-        $allowed = $this->allowedMediaType[$type];
-
-        if ($allowed === '*') {
-            return;
-        }
-
-        /** @var string[] $allowed */
-        if (!in_array($subType, $allowed, true)) {
-            throw new RuleException(sprintf($this->errorMessage, $mediaType));
-        }
+        throw new RuleException(sprintf($this->errorMessage, $mediaType));
     }
 
     /**
@@ -99,10 +77,10 @@ final class MediaType implements RuleInterface
      * - All subtypes for type ("image/*")
      * - Specific subtype across all types ("*\/png")
      *
-     * @param string $string Media type pattern to allow. Must contain exactly one '/'
+     * @param string $pattern Media type pattern to allow. Must contain exactly one '/'
      *        with no surrounding spaces. Examples:
-     *        - Valid: "image/jpeg", "image/*", "*\/png"
-     *        - Invalid: "*", "image/", "/png", "image /*", "image/ png"
+     *        - Valid: "*", "image/jpeg", "image/*", "*\/png"
+     *        - Invalid: "image/", "/png", "image /*", "image/ png"
      *
      * @return self For method chaining
      * @throws RuleException When:
@@ -113,77 +91,51 @@ final class MediaType implements RuleInterface
      *
      * @see MediaTypeTest::dataForAllowFailed() For all invalid cases
      */
-    public function allow(string $string): MediaType
+    public function allow(string $pattern): MediaType
     {
-        if (!str_contains($string, '/')) {
-            throw new RuleException(sprintf('Media Type is wrong: %s', $string));
+        if ($pattern === '*') {
+            $pattern = '*/*';
         }
-
-        list($type, $subType) = $this->explode($string);
-
-        if ($type === '*') {
-            $this->allowedAllMediaType = true;
-            return $this;
-        }
-
-        /** @var string[]|string $allowType */
-        $allowType = $this->allowedMediaType[$type] ?? [];
-
-
-        if ($allowType === '*') {
-            return $this;
-        }
-
-        if ($subType === '*') {
-            $allowType = $subType;
-        } else {
-            $allowType[] = $subType;
-        }
-
-        if (is_array($allowType)) {
-            $allowType = array_unique($allowType);
-        }
-
-        $this->allowedMediaType[$type] = $allowType;
+        $this->validateMediaTypePattern($pattern);
+        $this->allowPatterns[] = $this->createRegexPattern($pattern);
         return $this;
     }
 
-
     /**
-     * Gets currently allowed media types
-     *
-     * @return array|string Allowed media types configuration
+     * @psalm-return non-empty-string
      */
-    public function getAllowedMediaType(): array|string
+    private function createRegexPattern(string $string): string
     {
-        return $this->allowedMediaType;
+        $escaped = preg_quote($string, '/');
+        $regex = str_replace('\*', '.*', $escaped);
+        return '/^' . $regex . '$/i';
     }
 
-    /**
-     * Validates and splits media type into type/subtype components
-     *
-     * @param string $string Media type to validate and split (e.g. "image/jpeg")
-     * @return string[] Array with exactly two elements: [type, subtype]
-     * @throws RuleException When:
-     *         - Input doesn't contain exactly one '/' character
-     *         - Either type or subtype is empty
-     *         - There are spaces around the '/' separator
-     *         - The format is invalid (e.g. "image/", "/png", "image /*")
-     *
-     * @see MediaTypeTest::dataForAllowFailed() For all invalid format cases
-     */
-    private function explode(string $string): array
-    {
-        list($type, $subType) = explode('/', trim($string));
 
-        if (empty($type)
-            || empty($subType)
-            || str_ends_with($type, ' ')
-            || str_starts_with($subType, ' ')
-        ) {
-            throw new RuleException(sprintf('Media Type is wrong: `%s`', $string));
+    public function validateMediaTypePattern(string $pattern): void
+    {
+        if (substr_count($pattern, '/') !== 1) {
+            throw new RuleException(sprintf(
+                'Media type pattern must contain exactly one "/": %s',
+                $pattern
+            ));
         }
 
-        return array($type, $subType);
+        [$type, $subType] = explode('/', $pattern);
+
+        if ($type === '' || $subType === '') {
+            throw new RuleException(sprintf(
+                'Media type pattern parts cannot be empty: %s',
+                $pattern
+            ));
+        }
+
+        if (str_contains($type, ' ') || str_contains($subType, ' ')) {
+            throw new RuleException(sprintf(
+                'Media type pattern contains spaces: %s',
+                $pattern
+            ));
+        }
     }
+
 }
