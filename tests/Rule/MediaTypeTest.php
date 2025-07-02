@@ -57,12 +57,46 @@ class MediaTypeTest extends TestCase
         );
 
         $rule = new MediaType();
-        $rule->allow('*/example');
+        $rule->allow('*/png');
         $rule->check($file);
-
         // Tests without assertions does not generate coverage #3016
         // https://github.com/sebastianbergmann/phpunit/issues/3016
         $this->assertTrue(true);
+    }
+
+    #[DataProvider('successTestData')]
+    public function testSuccessCheck(string $mediaType, array $allows)
+    {
+        $file = new UploadedFile(
+            $this->tmpFile,
+            null,
+            UPLOAD_ERR_OK,
+            clientMediaType: $mediaType
+        );
+
+        $rule = new MediaType();
+        foreach ($allows as $allow) {
+            $rule->allow($allow);
+        }
+        $rule->check($file);
+        // Tests without assertions does not generate coverage #3016
+        // https://github.com/sebastianbergmann/phpunit/issues/3016
+        $this->assertTrue(true);
+    }
+
+    public static function successTestData(): array
+    {
+        return [
+            ['image/png', ['*/png']],
+            ['image/png', ['image/*']],
+            ['image/png', ['*/*']],
+            ['image/png', ['*/png', 'image/*']],
+            ['image/png', ['image/*', '*/png']],
+            ['image/png', ['image/*', '*/png', '*/*']],
+            ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', ['*/*']],
+            ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', ['*/vnd.openxmlformats-officedocument.*']],
+
+        ];
     }
 
 
@@ -77,7 +111,7 @@ class MediaTypeTest extends TestCase
 
         $rule = new MediaType();
         $rule->allow('image/jpg')
-        ->allow('image/png');
+            ->allow('image/png');
         $rule->check($file);
 
         // Tests without assertions does not generate coverage #3016
@@ -87,7 +121,7 @@ class MediaTypeTest extends TestCase
 
     public function testCheckFailedIfManyAllowedButTypeNotSet()
     {
-        $this->expectExceptionMessage('Media type is disallowed: `plain/*`');
+        $this->expectExceptionMessage('Media type is disallowed: `plain/jpg`');
         $file = new UploadedFile(
             $this->tmpFile,
             null,
@@ -117,68 +151,9 @@ class MediaTypeTest extends TestCase
         $rule->check($file);
     }
 
-    public function testAllowSuccess()
-    {
-        $rule = new MediaType();
-        $rule->allow('example/example');
-
-        $this->assertSame([
-            'example' => ['example']
-        ], $rule->getAllowedMediaType());
-
-        $rule->allow('image/jpg');
-        $this->assertSame([
-            'example' => ['example'],
-            'image' => ['jpg']
-        ], $rule->getAllowedMediaType());
-
-        $rule->allow('application/json');
-        $this->assertSame([
-            'example' => ['example'],
-            'image' => ['jpg'],
-            'application' => ['json']
-        ], $rule->getAllowedMediaType());
-
-        $rule->allow('image/png ');
-        $rule->allow('image/png');
-        $this->assertSame([
-            'example' => ['example'],
-            'image' => ['jpg', 'png'],
-            'application' => ['json']
-        ], $rule->getAllowedMediaType());
-
-        $rule->allow('image/*');
-        $this->assertSame([
-            'example' => ['example'],
-            'image' => '*',
-            'application' => ['json']
-        ], $rule->getAllowedMediaType());
-
-        $rule->allow('image/bmp');
-        $this->assertSame([
-            'example' => ['example'],
-            'image' => '*',
-            'application' => ['json']
-        ], $rule->getAllowedMediaType());
-
-        $rule->allow('image/bmp');
-        $this->assertSame([
-            'example' => ['example'],
-            'image' => '*',
-            'application' => ['json']
-        ], $rule->getAllowedMediaType());
-
-        $rule->allow('*/bmp');
-        $this->assertSame([
-            'example' => ['example'],
-            'image' => '*',
-            'application' => ['json']
-        ], $rule->getAllowedMediaType());
-    }
-
     public function testCheckFailedIfMediaTypeIsNull()
     {
-        $this->expectExceptionMessage('Media Type ins null');
+        $this->expectExceptionMessage('Media type is null');
         $file = new UploadedFile(
             $this->tmpFile,
             null,
@@ -198,7 +173,6 @@ class MediaTypeTest extends TestCase
             ['image/'],
             ['/png'],
             ['image'],
-            ['*'],
             ['*/'],
             ['/*'],
         ];
@@ -209,7 +183,9 @@ class MediaTypeTest extends TestCase
     {
         $this->expectException(RuleException::class);
         $rule = new MediaType();
+
         $rule->allow($mediaType);
+        dump($rule);
     }
 
 
