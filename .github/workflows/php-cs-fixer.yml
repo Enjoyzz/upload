@@ -2,6 +2,7 @@ name: PHP-CS-Fixer
 
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   php-cs-fixer:
@@ -26,14 +27,14 @@ jobs:
           git status
 
       - name: Run PHP-CS-Fixer (dry run)
-        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3.89.1-php8.2
         with:
           args: fix . --dry-run --diff --verbose
         continue-on-error: true
 
       - name: Apply PHP-CS-Fixer fixes
         id: php-cs-fix
-        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3.89.1-php8.2
         with:
           args: fix . --verbose
 
