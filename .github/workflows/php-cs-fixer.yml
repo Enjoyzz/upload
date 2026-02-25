@@ -26,14 +26,14 @@ jobs:
           git status
 
       - name: Run PHP-CS-Fixer (dry run)
-        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3
         with:
           args: fix . --dry-run --diff --verbose
         continue-on-error: true
 
       - name: Apply PHP-CS-Fixer fixes
         id: php-cs-fix
-        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.2
+        uses: docker://ghcr.io/php-cs-fixer/php-cs-fixer:3-php8.3
         with:
           args: fix . --verbose
 
